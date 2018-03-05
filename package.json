@@ -32,7 +32,6 @@
 	"icon": "media/dart.png",
 	"activationEvents": [
 		"onLanguage:dart",
-		"onView:dartPackages",
 		"workspaceContains:**/pubspec.yaml",
 		"workspaceContains:**/*.dart",
 		"onCommand:flutter.createProject",
@@ -417,6 +416,11 @@
 		},
 		"views": {
 			"explorer": [
+				{
+					"id": "dartFlutterOutline",
+					"name": "Flutter Outline",
+					"when": "dart-code:flutterProjectLoaded && dart-code:showFlutterOutline"
+				},
 				{
 					"id": "dartPackages",
 					"name": "Dependencies",

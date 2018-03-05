@@ -45,6 +45,7 @@ import { analyzerSnapshotPath, dartVMPath, findSdks, flutterPath, handleMissingS
 import { showUserPrompts } from "./user_prompts";
 import * as util from "./utils";
 import { fsPath } from "./utils";
+import { FlutterOutlineProvider } from "./views/flutter_outline_view";
 import { DartPackagesProvider } from "./views/packages_view";
 
 const DART_MODE: vs.DocumentFilter[] = [{ language: "dart", scheme: "file" }];
@@ -249,6 +250,9 @@ export function activate(context: vs.ExtensionContext, isRestart: boolean = fals
 		});
 
 		context.subscriptions.push(new OpenFileTracker(analyzer));
+
+		if (analyzer.capabilities.supportsFlutterOutline)
+			context.subscriptions.push(vs.window.registerTreeDataProvider("dartFlutterOutline", new FlutterOutlineProvider(analyzer)));
 	});
 
 	// Handle config changes so we can reanalyze if necessary.
@@ -275,7 +279,7 @@ export function activate(context: vs.ExtensionContext, isRestart: boolean = fals
 	context.subscriptions.push(new TypeHierarchyCommand(analyzer));
 	context.subscriptions.push(new GoToSuperCommand(analyzer));
 
-	// Register our view providers.
+	// Register our dependency tree provider.
 	const dartPackagesProvider = new DartPackagesProvider();
 	dartPackagesProvider.setWorkspaces(util.getDartWorkspaceFolders());
 	context.subscriptions.push(dartPackagesProvider);
