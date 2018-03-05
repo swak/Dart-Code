@@ -412,6 +412,12 @@
 					"command": "dart.startWithoutDebugging",
 					"group": "4.5_exec@1"
 				}
+			],
+			"view/item/context": [
+				// {
+				// 	"when": "view == dartFlutterOutline && viewItem =~ /dart-code:isWidget:.*--refactor--.*/",
+				// 	"command": "pub.get"
+				// }
 			]
 		},
 		"views": {
