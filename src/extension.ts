@@ -33,6 +33,7 @@ import { DartSymbolProvider } from "./providers/dart_symbol_provider";
 import { DartTypeFormattingEditProvider } from "./providers/dart_type_formatting_edit_provider";
 import { DebugConfigProvider } from "./providers/debug_config_provider";
 import { FixCodeActionProvider } from "./providers/fix_code_action_provider";
+import { FlutterOutlineCommands } from "./commands/flutter_outline";
 import { LegacyDartDocumentSymbolProvider } from "./providers/legacy_dart_document_symbol_provider";
 import { LegacyDartWorkspaceSymbolProvider } from "./providers/legacy_dart_workspace_symbol_provider";
 import { RefactorCodeActionProvider } from "./providers/refactor_code_action_provider";
@@ -270,6 +271,7 @@ export function activate(context: vs.ExtensionContext, isRestart: boolean = fals
 	// Register SDK commands.
 	const sdkCommands = new SdkCommands(context, sdks, analytics);
 	const debugCommands = new DebugCommands(context, analytics);
+	const flutterOutlineCommands = new FlutterOutlineCommands(context);
 
 	// Set up commands for Dart editors.
 	context.subscriptions.push(new EditCommands(context, analyzer));
