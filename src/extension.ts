@@ -10,6 +10,7 @@ import { findPackageRoots } from "./analysis/utils";
 import { Analytics } from "./analytics";
 import { DebugCommands } from "./commands/debug";
 import { EditCommands } from "./commands/edit";
+import { FlutterOutlineCommands } from "./commands/flutter_outline";
 import { GoToSuperCommand } from "./commands/go_to_super";
 import { RefactorCommands } from "./commands/refactor";
 import { SdkCommands } from "./commands/sdk";
@@ -33,7 +34,6 @@ import { DartSymbolProvider } from "./providers/dart_symbol_provider";
 import { DartTypeFormattingEditProvider } from "./providers/dart_type_formatting_edit_provider";
 import { DebugConfigProvider } from "./providers/debug_config_provider";
 import { FixCodeActionProvider } from "./providers/fix_code_action_provider";
-import { FlutterOutlineCommands } from "./commands/flutter_outline";
 import { LegacyDartDocumentSymbolProvider } from "./providers/legacy_dart_document_symbol_provider";
 import { LegacyDartWorkspaceSymbolProvider } from "./providers/legacy_dart_workspace_symbol_provider";
 import { RefactorCodeActionProvider } from "./providers/refactor_code_action_provider";
@@ -55,6 +55,7 @@ const HTML_MODE: vs.DocumentFilter[] = [{ language: "html", scheme: "file" }];
 const DART_PROJECT_LOADED = "dart-code:dartProjectLoaded";
 const FLUTTER_PROJECT_LOADED = "dart-code:flutterProjectLoaded";
 export const SERVICE_EXTENSION_CONTEXT_PREFIX = "dart-code:serviceExtension.";
+export let extensionPath: string = null;
 
 let analyzer: Analyzer;
 let flutterDaemon: FlutterDaemon;
@@ -84,6 +85,7 @@ export function activate(context: vs.ExtensionContext, isRestart: boolean = fals
 	showLintNames = config.showLintNames;
 	previousSettings = getSettingsThatRequireRestart();
 
+	extensionPath = context.extensionPath;
 	const extensionStartTime = new Date();
 	util.logTime();
 	const sdks = findSdks();
