@@ -690,6 +690,12 @@
 					"description": "Whether to force Windows drive letters always to uppercase to improve compatibility.",
 					"scope": "window"
 				},
+				"dart.previewFlutterOutline": {
+					"type": "boolean",
+					"default": false,
+					"description": "Whether to enable the Flutter Outline tree.",
+					"scope": "window"
+				},
 				"dart.analyzerAdditionalArgs": {
 					"type": "array",
 					"description": "Additional arguments to pass to the Dart analysis server.\nThis is a diagnostic setting that should not normally be set.",

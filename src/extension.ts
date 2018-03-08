@@ -254,7 +254,7 @@ export function activate(context: vs.ExtensionContext, isRestart: boolean = fals
 
 		context.subscriptions.push(new OpenFileTracker(analyzer));
 
-		if (analyzer.capabilities.supportsFlutterOutline)
+		if (config.previewFlutterOutline && analyzer.capabilities.supportsFlutterOutline)
 			context.subscriptions.push(vs.window.registerTreeDataProvider("dartFlutterOutline", new FlutterOutlineProvider(analyzer)));
 	});
 
@@ -413,7 +413,8 @@ function getSettingsThatRequireRestart() {
 		+ config.closingLabels
 		+ config.analyzeAngularTemplates
 		+ config.normaliseWindowsDriveLetters
-		+ config.analysisServerFolding;
+		+ config.analysisServerFolding
+		+ config.previewFlutterOutline;
 }
 
 export function deactivate(isRestart: boolean = false): PromiseLike<void> {
