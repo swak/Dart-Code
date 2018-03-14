@@ -17,7 +17,7 @@ export class EditCommands implements vs.Disposable {
 			vs.commands.registerCommand("_dart.organizeImports", this.organizeImports, this),
 			vs.commands.registerCommand("dart.sortMembers", this.sortMembers, this),
 			vs.commands.registerCommand("_dart.applySourceChange", this.applyEdits, this),
-			vs.commands.registerCommand("_dart.highlightRange", this.highlightRange, this),
+			vs.commands.registerCommand("_dart.showCode", this.showCode, this),
 			vs.commands.registerCommand("dart.completeStatement", this.completeStatement, this),
 		);
 	}
@@ -26,15 +26,19 @@ export class EditCommands implements vs.Disposable {
 		return this.sendEdit(this.analyzer.editOrganizeDirectives, "Organize Imports");
 	}
 
-	private highlightRange(editor: vs.TextEditor, range: vs.Range) {
-		// TODO: We don't have a way of highlighting so for now we just move cursor there
-		// See https://github.com/Microsoft/vscode/issues/45059
+	private showCode(editor: vs.TextEditor, displayRange: vs.Range, highlightRange: vs.Range, cursorPosition?: vs.Position) {
 		vs.window.showTextDocument(editor.document);
-		editor.selection = new vs.Selection(range.start, range.end);
-		vs.commands.executeCommand("revealLine", {
-			at: "center",
-			lineNumber: range.start.line,
-		});
+
+		// Move the cursor to near the element.
+		editor.selection = new vs.Selection(cursorPosition, cursorPosition);
+
+		// Ensure the code is visible on screen.
+		// TODO: This is bogus for code that's longer than the screen
+		// See https://github.com/Microsoft/vscode/issues/45742
+		editor.revealRange(displayRange, vs.TextEditorRevealType.InCenterIfOutsideViewport);
+
+		// TODO: Implement highlighting
+		// See https://github.com/Microsoft/vscode/issues/45059
 	}
 
 	private sortMembers(): Thenable<void> {
