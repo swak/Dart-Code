@@ -52,7 +52,7 @@ export class FlutterOutlineProvider implements vs.TreeDataProvider<vs.TreeItem>,
 		if (editor && isAnalyzable(editor.document)) {
 			this.activeEditor = editor;
 			this.flutterOutline = null;
-
+			this.refresh(); // Force update (to nothing) while requests are in-flight.
 			this.analyzer.forceNotificationsFor(editor.document.fileName);
 		} else {
 			FlutterOutlineProvider.hideTree();
@@ -68,9 +68,11 @@ export class FlutterOutlineProvider implements vs.TreeDataProvider<vs.TreeItem>,
 		return element;
 	}
 
-	public async getChildren(element?: FlutterWidgetItem): Promise<vs.TreeItem[]> {
-		const outline = element ? element.outline : this.flutterOutline ? this.flutterOutline.outline : null;
-		const children: vs.TreeItem[] = [];
+	public async getChildren(element?: FlutterWidgetItem): Promise<FlutterWidgetItem[]> {
+		const outline = element
+			? element.outline
+			: (this.flutterOutline ? this.flutterOutline.outline : null);
+		const children: FlutterWidgetItem[] = [];
 		const editor = this.activeEditor;
 
 		if (outline) {
