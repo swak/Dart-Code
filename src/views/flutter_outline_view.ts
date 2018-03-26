@@ -153,8 +153,11 @@ export class FlutterWidgetItem extends vs.TreeItem {
 					editor.document.positionAt(outline.codeOffset),
 					editor.document.positionAt(outline.codeOffset + outline.codeLength),
 				),
-				// Cursor position
-				editor.document.positionAt((outline.dartElement ? outline.dartElement.location : outline).offset),
+				// Selection (we just want to move cursor, so it's 0-length)
+				new vs.Range(
+					editor.document.positionAt((outline.dartElement ? outline.dartElement.location : outline).offset),
+					editor.document.positionAt((outline.dartElement ? outline.dartElement.location : outline).offset),
+				),
 			],
 			command: "_dart.showCode",
 			title: "",

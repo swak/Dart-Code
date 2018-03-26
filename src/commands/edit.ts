@@ -26,11 +26,11 @@ export class EditCommands implements vs.Disposable {
 		return this.sendEdit(this.analyzer.editOrganizeDirectives, "Organize Imports");
 	}
 
-	private showCode(editor: vs.TextEditor, displayRange: vs.Range, highlightRange: vs.Range, cursorPosition?: vs.Position) {
+	private showCode(editor: vs.TextEditor, displayRange: vs.Range, highlightRange: vs.Range, selectionRange?: vs.Range) {
 		vs.window.showTextDocument(editor.document);
 
-		// Move the cursor to near the element.
-		editor.selection = new vs.Selection(cursorPosition, cursorPosition);
+		if (selectionRange)
+			editor.selection = new vs.Selection(selectionRange.start, selectionRange.end);
 
 		// Ensure the code is visible on screen.
 		// TODO: This is bogus for code that's longer than the screen
