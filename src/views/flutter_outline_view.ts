@@ -39,11 +39,6 @@ export class FlutterOutlineProvider implements vs.TreeDataProvider<vs.TreeItem>,
 	}
 
 	private update() {
-		if (!this.flutterOutline || !this.activeEditor || this.flutterOutline.file !== this.activeEditor.document.fileName || !this.flutterOutline.outline || !this.flutterOutline.outline.children || this.flutterOutline.outline.children.length === 0) {
-			FlutterOutlineProvider.hideTree();
-			return;
-		}
-
 		FlutterOutlineProvider.showTree();
 		this.refresh();
 	}
@@ -54,9 +49,23 @@ export class FlutterOutlineProvider implements vs.TreeDataProvider<vs.TreeItem>,
 			this.flutterOutline = null;
 			this.refresh(); // Force update (to nothing) while requests are in-flight.
 			this.analyzer.forceNotificationsFor(editor.document.fileName);
-		} else {
-			FlutterOutlineProvider.hideTree();
+		} else if (editor && editor.document.uri.scheme === "file") {
+			// HACK: We can't currently reliably tell when editors are changed that are only real
+			// text editors (debug window is considered an editor) so we should only hide the tree
+			// when we know a file that is not ours is selected.
+			// https://github.com/Microsoft/vscode/issues/45188
 			this.activeEditor = null;
+			FlutterOutlineProvider.hideTree();
+		} else {
+			// HACK: If there are no valid open editors, hide the tree.
+			// The timeout is because the open editors disappear briefly during a closing
+			// of one preview and opening of another :(
+			// https://github.com/Microsoft/vscode/issues/45188.
+			setTimeout(() => {
+				if (!vs.window.visibleTextEditors.filter((e) => isAnalyzable(e.document)).length) {
+					FlutterOutlineProvider.hideTree();
+				}
+			}, 100);
 		}
 	}
 
