@@ -150,9 +150,8 @@ export class FlutterWidgetItem extends vs.TreeItem {
 				),
 				// Code to highlight
 				new vs.Range(
-					// TODO: Change to codeOffset/codeLength
-					editor.document.positionAt(outline.offset),
-					editor.document.positionAt(outline.offset + outline.length),
+					editor.document.positionAt(outline.codeOffset),
+					editor.document.positionAt(outline.codeOffset + outline.codeLength),
 				),
 				// Cursor position
 				editor.document.positionAt((outline.dartElement ? outline.dartElement.location : outline).offset),
