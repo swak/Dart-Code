@@ -77,7 +77,10 @@ export class FlutterOutlineProvider implements vs.TreeDataProvider<vs.TreeItem>,
 			if (outline.children && outline.length) {
 				for (const c of outline.children) {
 
-					const canHaveFixes = isWidget(c);
+					// TODO: We can't use fixes for context menu unless we have a more performant
+					// way of getting them.
+					// https://github.com/dart-lang/sdk/issues/32462
+					const canHaveFixes = false; // isWidget(c);
 					const fixes = canHaveFixes
 						? await getFixes(editor, c)
 						: [];
