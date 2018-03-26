@@ -33,9 +33,11 @@ export class EditCommands implements vs.Disposable {
 			editor.selection = new vs.Selection(selectionRange.start, selectionRange.end);
 
 		// Ensure the code is visible on screen.
-		// TODO: This is bogus for code that's longer than the screen
-		// See https://github.com/Microsoft/vscode/issues/45742
 		editor.revealRange(displayRange, vs.TextEditorRevealType.InCenterIfOutsideViewport);
+
+		// Re-reveal the first line, to ensure it was always visible (eg. in case the main range was bigger than the screen).
+		// Using .Default means it'll do as little scrolling as possible.
+		editor.revealRange(new vs.Range(displayRange.start, displayRange.start), vs.TextEditorRevealType.Default);
 
 		// TODO: Implement highlighting
 		// See https://github.com/Microsoft/vscode/issues/45059
