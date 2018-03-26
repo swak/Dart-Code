@@ -2487,6 +2487,17 @@ export interface FlutterOutline {
 	length: number;
 
 	/**
+	 * The offset of the first character of the element code, which is
+	 * neither documentation, nor annotation.
+	 */
+	codeOffset: number;
+
+	/**
+	 * The length of the element code.
+	 */
+	codeLength: number;
+
+	/**
 	 * The text label of the node children of the node.
 	 * It is provided for any FlutterOutlineKind.GENERIC node,
 	 * where better information is not available.
@@ -2537,6 +2548,13 @@ export interface FlutterOutline {
 	id?: number;
 
 	/**
+	 * True if the node is a widget class, so it can potentially be
+	 * rendered, even if it does not yet have the rendering constructor.
+	 * This field is omitted if the node is not a widget class.
+	 */
+	isWidgetClass?: boolean;
+
+	/**
 	 * If the node is a widget class that can be rendered for IDE, the name
 	 * of the constructor that should be used to instantiate the widget.
 	 * Empty string for default constructor. Absent if the node is not a
@@ -2545,15 +2563,21 @@ export interface FlutterOutline {
 	renderConstructor?: string;
 
 	/**
-	 * If the node is a StatefulWidget that can be rendered, and its State
-	 * class is defined in the same file, the offset of the State class code
+	 * If the node is a StatefulWidget, and its state class is defined in
+	 * the same file, the name of the state class.
+	 */
+	stateClassName?: string;
+
+	/**
+	 * If the node is a StatefulWidget that can be rendered, and its state
+	 * class is defined in the same file, the offset of the state class code
 	 * in the file.
 	 */
 	stateOffset?: number;
 
 	/**
-	 * If the node is a StatefulWidget that can be rendered, and its State
-	 * class is defined in the same file, the length of the State class code
+	 * If the node is a StatefulWidget that can be rendered, and its state
+	 * class is defined in the same file, the length of the state class code
 	 * in the file.
 	 */
 	stateLength?: number;
@@ -3996,6 +4020,7 @@ export type RefactoringKind =
 	| "CONVERT_METHOD_TO_GETTER"
 	| "EXTRACT_LOCAL_VARIABLE"
 	| "EXTRACT_METHOD"
+	| "EXTRACT_WIDGET"
 	| "INLINE_LOCAL_VARIABLE"
 	| "INLINE_METHOD"
 	| "MOVE_FILE"
@@ -4180,3 +4205,4 @@ export interface SourceFileEdit {
 	 */
 	edits: SourceEdit[];
 }
+
