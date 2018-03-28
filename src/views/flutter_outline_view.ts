@@ -12,30 +12,32 @@ import { extensionPath } from "../extension";
 const DART_SHOW_FLUTTER_OUTLINE = "dart-code:showFlutterOutline";
 const DART_IS_WIDGET = "dart-code:isWidget";
 
-export class FlutterOutlineProvider implements vs.TreeDataProvider<vs.TreeItem>, vs.Disposable {
+export class FlutterOutlineProvider implements vs.TreeDataProvider<FlutterWidgetItem>, vs.Disposable {
 	private subscriptions: vs.Disposable[] = [];
 	private analyzer: Analyzer;
 	private activeEditor: vs.TextEditor;
 	private flutterOutline: as.FlutterOutlineNotification;
+	private treeNodesByLine: { [key: number]: FlutterWidgetItem[]; } = [];
 	private updateTimeout: NodeJS.Timer;
 	private onDidChangeTreeDataEmitter: vs.EventEmitter<FlutterWidgetItem | undefined> = new vs.EventEmitter<FlutterWidgetItem | undefined>();
 	public readonly onDidChangeTreeData: vs.Event<FlutterWidgetItem | undefined> = this.onDidChangeTreeDataEmitter.event;
 
 	constructor(analyzer: Analyzer) {
 		this.analyzer = analyzer;
-
 		this.analyzer.registerForFlutterOutline((n) => {
 			if (this.activeEditor && n.file === this.activeEditor.document.fileName) {
 				this.flutterOutline = n;
+				this.treeNodesByLine = [];
 				// Delay this so if we're getting lots of updates we don't flicker.
 				clearTimeout(this.updateTimeout);
-				this.updateTimeout = setTimeout(() => this.update(), 500);
+				this.updateTimeout = setTimeout(() => this.update(), 200);
 			}
 		});
 
 		this.subscriptions.push(vs.window.onDidChangeActiveTextEditor((e) => this.setTrackingFile(e)));
-		if (vs.window.activeTextEditor)
+		if (vs.window.activeTextEditor) {
 			this.setTrackingFile(vs.window.activeTextEditor);
+		}
 	}
 
 	private update() {
@@ -69,6 +71,23 @@ export class FlutterOutlineProvider implements vs.TreeDataProvider<vs.TreeItem>,
 		}
 	}
 
+	public getNodeAt(pos: vs.Position) {
+		if (!this.treeNodesByLine[pos.line])
+			return;
+
+		const offset = this.activeEditor.document.offsetAt(pos);
+		const nodes = this.treeNodesByLine[pos.line];
+		// We want the last node that started before the position (eg. most specific).
+		let currentBest = null;
+		for (const item of nodes) {
+			if (item.outline.offset < offset
+				&& item.outline.offset + item.outline.length > offset) {
+				currentBest = item;
+			}
+		}
+		return currentBest;
+	}
+
 	public refresh(): void {
 		this.onDidChangeTreeDataEmitter.fire();
 	}
@@ -96,18 +115,32 @@ export class FlutterOutlineProvider implements vs.TreeDataProvider<vs.TreeItem>,
 						? await getFixes(editor, c)
 						: [];
 					// Ensure we're still active editor before trying to use.
-					if (editor && editor.document && !editor.document.isClosed) {
+					if (editor && editor.document && !editor.document.isClosed && this.activeEditor === editor) {
 						const codeActionFixes =
 							fixes
 								.filter((f): f is vs.CodeAction => f instanceof vs.CodeAction)
 								.filter((ca) => ca.kind && ca.kind.value);
-						children.push(new FlutterWidgetItem(c, codeActionFixes, editor));
+						const node = new FlutterWidgetItem(element, c, codeActionFixes, editor);
+						children.push(node);
+						// Add this node to a lookup by line so we can quickly find it as the user moves around the doc.
+						const startLine = editor.document.positionAt(c.offset).line;
+						const endLine = editor.document.positionAt(c.offset + c.length).line;
+						for (let line = startLine; line <= endLine; line++) {
+							if (!this.treeNodesByLine[line]) {
+								this.treeNodesByLine[line] = [];
+							}
+							this.treeNodesByLine[line].push(node);
+						}
 					}
 				}
 			}
 		}
 
 		return children;
+	}
+
+	public getParent(element: FlutterWidgetItem): FlutterWidgetItem {
+		return element.parent;
 	}
 
 	private static setTreeVisible(visible: boolean) {
@@ -139,6 +172,7 @@ function getFixes(editor: vs.TextEditor, outline: as.FlutterOutline): Thenable<A
 
 export class FlutterWidgetItem extends vs.TreeItem {
 	constructor(
+		public readonly parent: FlutterWidgetItem,
 		public readonly outline: as.FlutterOutline,
 		public readonly fixes: vs.CodeAction[],
 		editor: vs.TextEditor,

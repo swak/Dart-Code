@@ -254,8 +254,20 @@ export function activate(context: vs.ExtensionContext, isRestart: boolean = fals
 
 		context.subscriptions.push(new OpenFileTracker(analyzer));
 
-		if (config.previewFlutterOutline && analyzer.capabilities.supportsFlutterOutline)
-			context.subscriptions.push(vs.window.registerTreeDataProvider("dartFlutterOutline", new FlutterOutlineProvider(analyzer)));
+		if (config.previewFlutterOutline && analyzer.capabilities.supportsFlutterOutline) {
+			const treeDataProvider = new FlutterOutlineProvider(analyzer);
+			const tree = vs.window.createTreeView("dartFlutterOutline", { treeDataProvider });
+
+			context.subscriptions.push(vs.window.onDidChangeTextEditorSelection((e) => {
+				if (e.selections && e.selections.length) {
+					const node = treeDataProvider.getNodeAt(e.selections[0].start);
+					if (node)
+						tree.reveal(node);
+				}
+			}));
+			context.subscriptions.push(tree);
+			context.subscriptions.push(treeDataProvider);
+		}
 	});
 
 	// Handle config changes so we can reanalyze if necessary.
