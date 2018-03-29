@@ -17,6 +17,7 @@ export class FlutterOutlineProvider implements vs.TreeDataProvider<FlutterWidget
 	private analyzer: Analyzer;
 	private activeEditor: vs.TextEditor;
 	private flutterOutline: as.FlutterOutlineNotification;
+	private rootNode: FlutterWidgetItem;
 	private treeNodesByLine: { [key: number]: FlutterWidgetItem[]; } = [];
 	private updateTimeout: NodeJS.Timer;
 	private onDidChangeTreeDataEmitter: vs.EventEmitter<FlutterWidgetItem | undefined> = new vs.EventEmitter<FlutterWidgetItem | undefined>();
@@ -40,9 +41,45 @@ export class FlutterOutlineProvider implements vs.TreeDataProvider<FlutterWidget
 		}
 	}
 
-	private update() {
+	private async update() {
+		// Build the tree from our outline
+		this.rootNode = await this.createTreeNode(null, this.flutterOutline.outline, this.activeEditor);
+
 		FlutterOutlineProvider.showTree();
 		this.refresh();
+	}
+
+	private async createTreeNode(parent: FlutterWidgetItem, element: as.FlutterOutline, editor: vs.TextEditor): Promise<FlutterWidgetItem> {
+		// TODO: We can't use fixes for context menu unless we have a more performant
+		// way of getting them.
+		// https://github.com/dart-lang/sdk/issues/32462
+		const canHaveFixes = false; // isWidget(c);
+		const fixes = canHaveFixes
+			? await getFixes(editor, element)
+			: [];
+		// Ensure we're still active editor before trying to use.
+		if (editor && editor.document && !editor.document.isClosed && this.activeEditor === editor) {
+			const codeActionFixes =
+				fixes
+					.filter((f): f is vs.CodeAction => f instanceof vs.CodeAction)
+					.filter((ca) => ca.kind && ca.kind.value);
+
+			const node = new FlutterWidgetItem(parent, element, codeActionFixes, editor);
+
+			// Add this node to a lookup by line so we can quickly find it as the user moves around the doc.
+			const startLine = editor.document.positionAt(element.offset).line;
+			const endLine = editor.document.positionAt(element.offset + element.length).line;
+			for (let line = startLine; line <= endLine; line++) {
+				if (!this.treeNodesByLine[line]) {
+					this.treeNodesByLine[line] = [];
+				}
+				this.treeNodesByLine[line].push(node);
+			}
+			if (element.children)
+				node.children = await Promise.all(element.children.map((c) => this.createTreeNode(node, c, editor)));
+
+			return node;
+		}
 	}
 
 	private setTrackingFile(editor: vs.TextEditor) {
@@ -96,47 +133,10 @@ export class FlutterOutlineProvider implements vs.TreeDataProvider<FlutterWidget
 		return element;
 	}
 
-	public async getChildren(element?: FlutterWidgetItem): Promise<FlutterWidgetItem[]> {
-		const outline = element
-			? element.outline
-			: (this.flutterOutline ? this.flutterOutline.outline : null);
-		const children: FlutterWidgetItem[] = [];
-		const editor = this.activeEditor;
-
-		if (outline) {
-			if (outline.children && outline.length) {
-				for (const c of outline.children) {
-
-					// TODO: We can't use fixes for context menu unless we have a more performant
-					// way of getting them.
-					// https://github.com/dart-lang/sdk/issues/32462
-					const canHaveFixes = false; // isWidget(c);
-					const fixes = canHaveFixes
-						? await getFixes(editor, c)
-						: [];
-					// Ensure we're still active editor before trying to use.
-					if (editor && editor.document && !editor.document.isClosed && this.activeEditor === editor) {
-						const codeActionFixes =
-							fixes
-								.filter((f): f is vs.CodeAction => f instanceof vs.CodeAction)
-								.filter((ca) => ca.kind && ca.kind.value);
-						const node = new FlutterWidgetItem(element, c, codeActionFixes, editor);
-						children.push(node);
-						// Add this node to a lookup by line so we can quickly find it as the user moves around the doc.
-						const startLine = editor.document.positionAt(c.offset).line;
-						const endLine = editor.document.positionAt(c.offset + c.length).line;
-						for (let line = startLine; line <= endLine; line++) {
-							if (!this.treeNodesByLine[line]) {
-								this.treeNodesByLine[line] = [];
-							}
-							this.treeNodesByLine[line].push(node);
-						}
-					}
-				}
-			}
-		}
-
-		return children;
+	public getChildren(element?: FlutterWidgetItem): FlutterWidgetItem[] {
+		return element
+			? element.children
+			: this.rootNode.children;
 	}
 
 	public getParent(element: FlutterWidgetItem): FlutterWidgetItem {
@@ -171,6 +171,7 @@ function getFixes(editor: vs.TextEditor, outline: as.FlutterOutline): Thenable<A
 }
 
 export class FlutterWidgetItem extends vs.TreeItem {
+	public children: FlutterWidgetItem[];
 	constructor(
 		public readonly parent: FlutterWidgetItem,
 		public readonly outline: as.FlutterOutline,
