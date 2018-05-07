@@ -6,7 +6,7 @@ import * as as from "../analysis/analysis_server_types";
 import { Analyzer } from "../analysis/analyzer";
 import { flutterOutlineCommands } from "../commands/flutter_outline";
 import { extensionPath } from "../extension";
-import { isAnalyzable } from "../utils";
+import { fsPath, isAnalyzable } from "../utils";
 
 const DART_SHOW_FLUTTER_OUTLINE = "dart-code:showFlutterOutline";
 const DART_IS_WIDGET = "dart-code:isWidget";
@@ -25,7 +25,7 @@ export class FlutterOutlineProvider implements vs.TreeDataProvider<FlutterWidget
 	constructor(analyzer: Analyzer) {
 		this.analyzer = analyzer;
 		this.analyzer.registerForFlutterOutline((n) => {
-			if (this.activeEditor && n.file === this.activeEditor.document.fileName) {
+			if (this.activeEditor && n.file === fsPath(this.activeEditor.document.uri)) {
 				this.flutterOutline = n;
 				this.treeNodesByLine = [];
 				// Delay this so if we're getting lots of updates we don't flicker.
@@ -86,7 +86,7 @@ export class FlutterOutlineProvider implements vs.TreeDataProvider<FlutterWidget
 			this.activeEditor = editor;
 			this.flutterOutline = null;
 			this.refresh(); // Force update (to nothing) while requests are in-flight.
-			this.analyzer.forceNotificationsFor(editor.document.fileName);
+			this.analyzer.forceNotificationsFor(fsPath(editor.document.uri));
 		} else if (editor && editor.document.uri.scheme === "file") {
 			// HACK: We can't currently reliably tell when editors are changed that are only real
 			// text editors (debug window is considered an editor) so we should only hide the tree
