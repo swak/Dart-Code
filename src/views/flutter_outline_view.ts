@@ -1,13 +1,12 @@
 "use strict";
 
-import * as vs from "vscode";
 import * as path from "path";
+import * as vs from "vscode";
 import * as as from "../analysis/analysis_server_types";
 import { Analyzer } from "../analysis/analyzer";
-import { isAnalyzable } from "../utils";
-import { editor } from "../../test/helpers";
 import { flutterOutlineCommands } from "../commands/flutter_outline";
 import { extensionPath } from "../extension";
+import { isAnalyzable } from "../utils";
 
 const DART_SHOW_FLUTTER_OUTLINE = "dart-code:showFlutterOutline";
 const DART_IS_WIDGET = "dart-code:isWidget";
@@ -122,6 +121,10 @@ export class FlutterOutlineProvider implements vs.TreeDataProvider<FlutterWidget
 				currentBest = item;
 			}
 		}
+
+		if (currentBest === this.rootNode)
+			return null; // Root node isn't actually in the tree.
+
 		return currentBest;
 	}
 
