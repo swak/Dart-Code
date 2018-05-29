@@ -116,8 +116,8 @@ export class FlutterOutlineProvider implements vs.TreeDataProvider<FlutterWidget
 		// We want the last node that started before the position (eg. most specific).
 		let currentBest = null;
 		for (const item of nodes) {
-			if (item.outline.offset < offset
-				&& item.outline.offset + item.outline.length > offset) {
+			if (item.outline.offset <= offset
+				&& item.outline.offset + item.outline.length >= offset) {
 				currentBest = item;
 			}
 		}
