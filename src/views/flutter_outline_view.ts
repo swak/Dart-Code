@@ -107,8 +107,8 @@ export class FlutterOutlineProvider implements vs.TreeDataProvider<FlutterWidget
 		}
 	}
 
-	public getNodeAt(pos: vs.Position) {
-		if (!this.treeNodesByLine[pos.line])
+	public getNodeAt(uri: vs.Uri, pos: vs.Position) {
+		if (this.flutterOutline.file !== fsPath(uri) || !this.treeNodesByLine[pos.line])
 			return;
 
 		const offset = this.activeEditor.document.offsetAt(pos);
