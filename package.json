@@ -711,7 +711,7 @@
 				"dart.previewFlutterOutline": {
 					"type": "boolean",
 					"default": false,
-					"description": "Whether to enable the Flutter Outline tree.",
+					"description": "EXPERIMENTAL: Whether to enable the Flutter Outline tree.",
 					"scope": "window"
 				},
 				"dart.analyzerAdditionalArgs": {
