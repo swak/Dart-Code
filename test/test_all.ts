@@ -56,12 +56,12 @@ function runNode(cwd: string, args: string[], env: any): Promise<number> {
 	});
 }
 
-async function runTests(testFolder: string, workspaceFolder: string, sdkPaths: string, codeVersion: string, runInfo: string): Promise<void> {
+async function runTests(testFolder: string, workspaceFolder: string, sdkPaths: string, codeVersion: string): Promise<void> {
 	console.log("\n\n");
 	console.log(yellow("############################################################"));
 	console.log(
 		yellow("## ")
-		+ `Running ${runInfo} using ${yellow(testFolder)}`
+		+ `Running using ${yellow(testFolder)}`
 		+ ` in workspace ${yellow(workspaceFolder)}`
 		+ ` using version ${yellow(codeVersion)} of Code`);
 	console.log(`${yellow("##")} Looking for SDKs in:`);
@@ -141,16 +141,14 @@ async function runAllTests(): Promise<void> {
 	const sdkPath = process.env.DART_SDK_PATHS || process.env.PATH;
 
 	const flutterRoot = process.env.FLUTTER_ROOT;
-	const totalRuns = 6;
-	let runNumber = 1;
 	try {
-		await runTests("dart_only", "hello_world", sdkPath, codeVersion, `${runNumber++} of ${totalRuns}`);
-		await runTests("flutter_only", "flutter_hello_world", sdkPath, codeVersion, `${runNumber++} of ${totalRuns}`);
-		await runTests("multi_root", "projects.code-workspace", sdkPath, codeVersion, `${runNumber++} of ${totalRuns}`);
-		await runTests("multi_project_folder", "", sdkPath, codeVersion, `${runNumber++} of ${totalRuns}`);
-		await runTests("not_activated/flutter_create", "empty", sdkPath, codeVersion, `${runNumber++} of ${totalRuns}`);
+		await runTests("dart_only", "hello_world", sdkPath, codeVersion);
+		await runTests("flutter_only", "flutter_hello_world", sdkPath, codeVersion);
+		await runTests("multi_root", "projects.code-workspace", sdkPath, codeVersion);
+		await runTests("multi_project_folder", "", sdkPath, codeVersion);
+		await runTests("not_activated/flutter_create", "empty", sdkPath, codeVersion);
 		if (flutterRoot) {
-			await runTests("flutter_repository", flutterRoot, sdkPath, codeVersion, `${runNumber++} of ${totalRuns}`);
+			await runTests("flutter_repository", flutterRoot, sdkPath, codeVersion);
 		} else {
 			console.error("FLUTTER_ROOT NOT SET, SKIPPING FLUTTER REPO TESTS");
 			exitCode = 1;
