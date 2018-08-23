@@ -16,8 +16,8 @@ function color(col: number, message: string) {
 	return "\u001b[" + col + "m" + message + "\u001b[0m";
 }
 
-// Set timeout at 20 mins.
-const timeoutInMilliseconds = 1000 * 60 * 20;
+// Set timeout at 10 mins.
+const timeoutInMilliseconds = 1000 * 60 * 10;
 function runNode(cwd: string, args: string[], env: any): Promise<number> {
 	return new Promise<number>((resolve, reject) => {
 		let timerWarn: NodeJS.Timer;
@@ -143,16 +143,6 @@ async function runAllTests(): Promise<void> {
 	const flutterRoot = process.env.FLUTTER_ROOT;
 	try {
 		await runTests("dart_only", "hello_world", sdkPath, codeVersion);
-		await runTests("flutter_only", "flutter_hello_world", sdkPath, codeVersion);
-		await runTests("multi_root", "projects.code-workspace", sdkPath, codeVersion);
-		await runTests("multi_project_folder", "", sdkPath, codeVersion);
-		await runTests("not_activated/flutter_create", "empty", sdkPath, codeVersion);
-		if (flutterRoot) {
-			await runTests("flutter_repository", flutterRoot, sdkPath, codeVersion);
-		} else {
-			console.error("FLUTTER_ROOT NOT SET, SKIPPING FLUTTER REPO TESTS");
-			exitCode = 1;
-		}
 	} catch (e) {
 		exitCode = 1;
 		console.error(e);
