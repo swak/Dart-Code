@@ -32,7 +32,7 @@ describe.only("dart cli debugger", () => {
 		return config;
 	}
 
-	it("runs a Dart script to completion", async () => {
+	it.only("runs a Dart script to completion", async () => {
 		const config = await startDebugger(helloWorldMainFile);
 		await Promise.all([
 			dc.configurationSequence(),
