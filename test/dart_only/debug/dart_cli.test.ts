@@ -3,7 +3,7 @@ import * as path from "path";
 import * as vs from "vscode";
 import { isLinux, platformEol } from "../../../src/debug/utils";
 import { fsPath } from "../../../src/utils";
-import { log } from "../../../src/utils/log";
+import { log, onLog } from "../../../src/utils/log";
 import { DartDebugClient } from "../../dart_debug_client";
 import { ensureMapEntry, ensureVariable, spawnProcessPaused } from "../../debug_helpers";
 import { activate, closeAllOpenFiles, defer, ext, extApi, getAttachConfiguration, getDefinition, getLaunchConfiguration, getPackages, helloWorldBrokenFile, helloWorldFolder, helloWorldGettersFile, helloWorldGoodbyeFile, helloWorldHttpFile, helloWorldMainFile, openFile, positionOf, sb } from "../../helpers";
@@ -12,6 +12,12 @@ describe.only("dart cli debugger", () => {
 	// We have tests that require external packages.
 	before("get packages", () => getPackages());
 	beforeEach("activate helloWorldMainFile", () => activate(helloWorldMainFile));
+
+	before("set up logger", () => {
+		onLog((e) => {
+			console.log(e.message);
+		});
+	});
 
 	let dc: DartDebugClient;
 	beforeEach("create debug client", () => {
