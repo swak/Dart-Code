@@ -8,7 +8,7 @@ import { DartDebugClient } from "../../dart_debug_client";
 import { ensureMapEntry, ensureVariable, spawnProcessPaused } from "../../debug_helpers";
 import { activate, closeAllOpenFiles, defer, ext, extApi, getAttachConfiguration, getDefinition, getLaunchConfiguration, getPackages, helloWorldBrokenFile, helloWorldFolder, helloWorldGettersFile, helloWorldGoodbyeFile, helloWorldHttpFile, helloWorldMainFile, openFile, positionOf, sb } from "../../helpers";
 
-describe("dart cli debugger", () => {
+describe.only("dart cli debugger", () => {
 	// We have tests that require external packages.
 	before("get packages", () => getPackages());
 	beforeEach("activate helloWorldMainFile", () => activate(helloWorldMainFile));
