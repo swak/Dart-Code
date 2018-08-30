@@ -59,7 +59,7 @@ describe.only("flutter run debugger", () => {
 		return config;
 	}
 
-	it("runs a Flutter application and remains active until told to quit", async () => {
+	it.skip("runs a Flutter application and remains active until told to quit", async () => {
 		const config = await startDebugger(flutterHelloWorldMainFile);
 		await Promise.all([
 			dc.configurationSequence(),
@@ -96,7 +96,7 @@ describe.only("flutter run debugger", () => {
 		]);
 	});
 
-	it("runs a Flutter application with a relative path", async () => {
+	it.skip("runs a Flutter application with a relative path", async () => {
 		const config = await startDebugger(flutterHelloWorldMainFile);
 		config.program = path.relative(fsPath(flutterHelloWorldFolder), fsPath(flutterHelloWorldMainFile));
 		await Promise.all([
@@ -114,7 +114,7 @@ describe.only("flutter run debugger", () => {
 		]);
 	});
 
-	it("runs a Flutter application with a variable in cwd", async () => {
+	it.skip("runs a Flutter application with a variable in cwd", async () => {
 		const config = await startDebugger(flutterHelloWorldMainFile, "${workspaceFolder}/");
 		config.program = path.relative(fsPath(flutterHelloWorldFolder), fsPath(flutterHelloWorldMainFile));
 		await Promise.all([
@@ -132,7 +132,7 @@ describe.only("flutter run debugger", () => {
 		]);
 	});
 
-	it("hot reloads successfully", async () => {
+	it.skip("hot reloads successfully", async () => {
 		const config = await startDebugger(flutterHelloWorldMainFile);
 		await Promise.all([
 			watchPromise("hot_reloads_successfully->configurationSequence", dc.configurationSequence()),
@@ -340,7 +340,7 @@ describe.only("flutter run debugger", () => {
 		ensureVariable(variables, "$e.message", "message", `"(TODO WHEN UNSKIPPING)"`);
 	});
 
-	it("logs expected text (and does not stop) at a logpoint", async function () {
+	it.skip("logs expected text (and does not stop) at a logpoint", async function () {
 		if (extApi.daemonCapabilities.debuggerIncorrectlyPausesOnHandledExceptions)
 			this.skip();
 		await openFile(flutterHelloWorldMainFile);
@@ -364,7 +364,7 @@ describe.only("flutter run debugger", () => {
 		]);
 	});
 
-	it("writes failure output", async function () {
+	it.skip("writes failure output", async function () {
 		// This test really wants to check stderr, but since the widgets library catches the exception is
 		// just comes via stdout.
 		if (extApi.daemonCapabilities.debuggerIncorrectlyPausesOnHandledExceptions)
