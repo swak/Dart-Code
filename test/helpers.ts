@@ -153,6 +153,8 @@ export async function openFile(file: vs.Uri): Promise<vs.TextEditor> {
 
 before("set console logger", async () => {
 	onLog((e) => {
+		if (e.category === LogCategory.Analyzer)
+			return;
 		console.log(e.message);
 	});
 });
