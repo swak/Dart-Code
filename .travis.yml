@@ -69,18 +69,8 @@ before_install:
 install:
   - npm install --depth 0
 
-before_script:
-  - if [ $TRAVIS_OS_NAME == "linux" ]; then
-      curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter;
-    else
-      curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-darwin-amd64 > ./cc-test-reporter;
-    fi
-  - chmod +x ./cc-test-reporter;
-  - ./cc-test-reporter before-build;
-
 script:
   - npm run vscode:prepublish
-  - npm run lint
   - npm test
   # flutter_tester processes are leaked by tests that terminate early:
   # https://github.com/Dart-Code/Dart-Code/issues/1175
@@ -98,8 +88,4 @@ after_script:
   - if [ $TRAVIS_PULL_REQUEST = "false" ]; then
       dpl --provider=s3 --bucket="test-results.dartcode.org" --skip_cleanup=true --local-dir=".test_results" --upload-dir="$TRAVIS_BRANCH/$TRAVIS_COMMIT/$TRAVIS_OS_NAME" --acl=public_read --default_text_charset=utf-8;
       dpl --provider=s3 --bucket="test-results.dartcode.org" --skip_cleanup=true --local-dir=".dart_code_test_logs" --upload-dir="logs/$TRAVIS_BRANCH/$TRAVIS_COMMIT/$TRAVIS_OS_NAME" --acl=public_read --default_text_charset=utf-8;
-    fi
-  - if [ $ONLY_RUN_CODE_VERSION == "STABLE" ] && [ $ONLY_RUN_DART_VERSION == "STABLE" ]; then
-      ./cc-test-reporter after-build --prefix ../../ --exit-code $TRAVIS_TEST_RESULT;
-      npm run post_result_to_chat;
     fi
