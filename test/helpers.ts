@@ -153,7 +153,9 @@ export async function openFile(file: vs.Uri): Promise<vs.TextEditor> {
 
 before("set console logger", async () => {
 	onLog((e) => {
-		if (e.category === LogCategory.Analyzer)
+		if (e.category === LogCategory.Analyzer
+			|| e.message.indexOf("setLibraryDebuggable") !== -1
+			|| e.message.indexOf('{"jsonrpc":"2.0", "result":{"type":"Success"}') !== -1)
 			return;
 		const message = _.trimEnd(e.message);
 		const maxLogLineLength = 200;
