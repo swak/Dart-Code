@@ -159,9 +159,15 @@ before("set console logger", async () => {
 			return;
 		const message = _.trimEnd(e.message);
 		const maxLogLineLength = 200;
-		const logMessage = maxLogLineLength && message.length > maxLogLineLength
+		let logMessage = (maxLogLineLength && message.length > maxLogLineLength
 			? message.substring(0, maxLogLineLength) + "…"
-			: message;
+			: message);
+
+		const stripStrings = ['{"jsonrpc":"2.0", "result":{"type":"Success"}'];
+		stripStrings.forEach((s) => {
+			const re = new RegExp(_.escapeRegExp(s), "g");
+			logMessage = logMessage.replace(re, "");
+		});
 
 		console.log(logMessage);
 	});
