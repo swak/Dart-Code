@@ -12,7 +12,7 @@ import { DartRenameProvider } from "../src/providers/dart_rename_provider";
 import { DebugConfigProvider } from "../src/providers/debug_config_provider";
 import { internalApiSymbol } from "../src/symbols";
 import { fsPath, ProjectType, Sdks, vsCodeVersionConstraint } from "../src/utils";
-import { log, logError, logTo, logWarn } from "../src/utils/log";
+import { log, logError, logTo, logWarn, onLog } from "../src/utils/log";
 import { TestResultsProvider } from "../src/views/test_view";
 import sinon = require("sinon");
 
@@ -150,6 +150,12 @@ export async function closeFile(file: vs.Uri): Promise<void> {
 export async function openFile(file: vs.Uri): Promise<vs.TextEditor> {
 	return vs.window.showTextDocument(await vs.workspace.openTextDocument(file));
 }
+
+before("set console logger", async () => {
+	onLog((e) => {
+		console.log(e.message);
+	});
+});
 
 beforeEach("set logger", async function () {
 	if (!this.currentTest)
