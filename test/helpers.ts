@@ -151,6 +151,7 @@ export async function openFile(file: vs.Uri): Promise<vs.TextEditor> {
 	return vs.window.showTextDocument(await vs.workspace.openTextDocument(file));
 }
 
+let testStart = new Date();
 before("set console logger", async () => {
 	onLog((e) => {
 		if (e.category === LogCategory.Analyzer
@@ -169,13 +170,17 @@ before("set console logger", async () => {
 			logMessage = logMessage.replace(re, "");
 		});
 
-		console.log(logMessage);
+		const now = new Date();
+		const seconds = (now.getTime() - testStart.getTime()) / 1000;
+
+		console.log(`[[[ + ${seconds} sec since test start ]] ${logMessage}`);
 	});
 });
 
 beforeEach("set logger", async function () {
 	if (!this.currentTest)
 		return;
+	testStart = new Date();
 	const logFolder = process.env.DC_TEST_LOGS || path.join(ext.extensionPath, ".dart_code_test_logs");
 	if (!fs.existsSync(logFolder))
 		fs.mkdirSync(logFolder);
