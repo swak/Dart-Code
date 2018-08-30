@@ -155,7 +155,13 @@ before("set console logger", async () => {
 	onLog((e) => {
 		if (e.category === LogCategory.Analyzer)
 			return;
-		console.log(e.message);
+		const message = _.trimEnd(e.message);
+		const maxLogLineLength = 200;
+		const logMessage = maxLogLineLength && message.length > maxLogLineLength
+			? message.substring(0, maxLogLineLength) + "…"
+			: message;
+
+		console.log(logMessage);
 	});
 });
 
