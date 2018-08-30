@@ -168,7 +168,7 @@ describe.only("flutter run debugger", () => {
 		]);
 	});
 
-	it("runs projects in sub-folders when the open file is in a project sub-folder", async () => {
+	it.only("runs projects in sub-folders when the open file is in a project sub-folder", async () => {
 		await openFile(flutterHelloWorldExampleSubFolderMainFile);
 		const config = await startDebugger();
 		if (disableDebuggingToAvoidBreakingOnCaughtException)
@@ -198,7 +198,7 @@ describe.only("flutter run debugger", () => {
 				? ""
 				: ` after ${numReloads} reload${numReloads === 1 ? "" : "s"}`;
 
-		it("stops at a breakpoint" + reloadDescription, async function () { // tslint:disable-line:only-arrow-functions
+		it.only("stops at a breakpoint" + reloadDescription, async function () { // tslint:disable-line:only-arrow-functions
 			if (numReloads > 0) {
 				if (extApi.daemonCapabilities.debuggerIncorrectlyPausesOnHandledExceptions)
 					this.skip();
@@ -240,7 +240,7 @@ describe.only("flutter run debugger", () => {
 	});
 
 	describe("can evaluate at breakpoint", function () { // tslint:disable-line:only-arrow-functions
-		it("simple expressions", async () => {
+		it.only("simple expressions", async () => {
 			await openFile(flutterHelloWorldMainFile);
 			const config = await startDebugger(flutterHelloWorldMainFile);
 			await Promise.all([
