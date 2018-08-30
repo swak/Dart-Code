@@ -161,10 +161,7 @@ before("set console logger", async () => {
 			|| _.trimEnd(e.message) === "")
 			return;
 		const message = _.trimEnd(e.message);
-		const maxLogLineLength = 200;
-		let logMessage = (maxLogLineLength && message.length > maxLogLineLength
-			? message.substring(0, maxLogLineLength) + "…"
-			: message);
+		let logMessage = message;
 
 		const stripStrings = ['{"jsonrpc":"2.0", "result":{"type":"Success"}'];
 		stripStrings.forEach((s) => {
