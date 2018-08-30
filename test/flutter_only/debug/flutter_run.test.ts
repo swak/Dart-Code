@@ -59,7 +59,7 @@ describe.only("flutter run debugger", () => {
 		return config;
 	}
 
-	it("runs a Flutter application and remains active until told to quit", async () => {
+	it.only("runs a Flutter application and remains active until told to quit", async () => {
 		const config = await startDebugger(flutterHelloWorldMainFile);
 		await Promise.all([
 			dc.configurationSequence(),
@@ -96,7 +96,7 @@ describe.only("flutter run debugger", () => {
 		]);
 	});
 
-	it("runs a Flutter application with a relative path", async () => {
+	it.only("runs a Flutter application with a relative path", async () => {
 		const config = await startDebugger(flutterHelloWorldMainFile);
 		config.program = path.relative(fsPath(flutterHelloWorldFolder), fsPath(flutterHelloWorldMainFile));
 		await Promise.all([
@@ -132,7 +132,7 @@ describe.only("flutter run debugger", () => {
 		]);
 	});
 
-	it("hot reloads successfully", async () => {
+	it.only("hot reloads successfully", async () => {
 		const config = await startDebugger(flutterHelloWorldMainFile);
 		await Promise.all([
 			watchPromise("hot_reloads_successfully->configurationSequence", dc.configurationSequence()),
@@ -147,7 +147,7 @@ describe.only("flutter run debugger", () => {
 		]);
 	});
 
-	it("hot restarts successfully", async () => {
+	it.only("hot restarts successfully", async () => {
 		const config = await startDebugger(flutterHelloWorldMainFile);
 		await Promise.all([
 			dc.configurationSequence(),
