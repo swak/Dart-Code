@@ -156,6 +156,8 @@ before("set console logger", async () => {
 		if (e.category === LogCategory.Analyzer
 			|| e.message.indexOf("setLibraryDebuggable") !== -1
 			|| e.message.indexOf('{"jsonrpc":"2.0", "result":{"type":"Success"}') !== -1
+			|| e.message.indexOf('{"jsonrpc":"2.0","method":"streamNotify","params":{"streamId":"Isolate","event":{"type":"Event","kind":"ServiceExtensionAdded"') !== -1
+			|| e.message.indexOf('"method":"streamListen"') !== -1
 			|| _.trimEnd(e.message) === "")
 			return;
 		const message = _.trimEnd(e.message);
