@@ -12,7 +12,7 @@ import { DartRenameProvider } from "../src/providers/dart_rename_provider";
 import { DebugConfigProvider } from "../src/providers/debug_config_provider";
 import { internalApiSymbol } from "../src/symbols";
 import { fsPath, ProjectType, Sdks, vsCodeVersionConstraint } from "../src/utils";
-import { log, logError, logTo, logWarn, onLog } from "../src/utils/log";
+import { log, logError, logTo, logWarn } from "../src/utils/log";
 import { TestResultsProvider } from "../src/views/test_view";
 import sinon = require("sinon");
 
@@ -151,30 +151,30 @@ export async function openFile(file: vs.Uri): Promise<vs.TextEditor> {
 	return vs.window.showTextDocument(await vs.workspace.openTextDocument(file));
 }
 
-before("set console logger", async () => {
-	onLog((e) => {
-		if (e.category === LogCategory.Analyzer
-			|| e.message.indexOf("setLibraryDebuggable") !== -1
-			|| e.message.indexOf('{"jsonrpc":"2.0", "result":{"type":"Success"}') !== -1
-			|| e.message.indexOf('{"jsonrpc":"2.0","method":"streamNotify","params":{"streamId":"Isolate","event":{"type":"Event","kind":"ServiceExtensionAdded"') !== -1
-			|| e.message.indexOf('"method":"streamListen"') !== -1
-			|| _.trimEnd(e.message) === "")
-			return;
-		const message = _.trimEnd(e.message);
-		const maxLogLineLength = 200;
-		let logMessage = (maxLogLineLength && message.length > maxLogLineLength
-			? message.substring(0, maxLogLineLength) + "…"
-			: message);
+// before("set console logger", async () => {
+// 	onLog((e) => {
+// 		if (e.category === LogCategory.Analyzer
+// 			|| e.message.indexOf("setLibraryDebuggable") !== -1
+// 			|| e.message.indexOf('{"jsonrpc":"2.0", "result":{"type":"Success"}') !== -1
+// 			|| e.message.indexOf('{"jsonrpc":"2.0","method":"streamNotify","params":{"streamId":"Isolate","event":{"type":"Event","kind":"ServiceExtensionAdded"') !== -1
+// 			|| e.message.indexOf('"method":"streamListen"') !== -1
+// 			|| _.trimEnd(e.message) === "")
+// 			return;
+// 		const message = _.trimEnd(e.message);
+// 		const maxLogLineLength = 200;
+// 		let logMessage = (maxLogLineLength && message.length > maxLogLineLength
+// 			? message.substring(0, maxLogLineLength) + "…"
+// 			: message);
 
-		const stripStrings = ['{"jsonrpc":"2.0", "result":{"type":"Success"}'];
-		stripStrings.forEach((s) => {
-			const re = new RegExp(_.escapeRegExp(s), "g");
-			logMessage = logMessage.replace(re, "");
-		});
+// 		const stripStrings = ['{"jsonrpc":"2.0", "result":{"type":"Success"}'];
+// 		stripStrings.forEach((s) => {
+// 			const re = new RegExp(_.escapeRegExp(s), "g");
+// 			logMessage = logMessage.replace(re, "");
+// 		});
 
-		console.log(logMessage);
-	});
-});
+// 		console.log(logMessage);
+// 	});
+// });
 
 beforeEach("set logger", async function () {
 	if (!this.currentTest)
