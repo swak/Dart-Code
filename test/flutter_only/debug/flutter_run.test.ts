@@ -86,6 +86,7 @@ describe.only("flutter run debugger", () => {
 	}
 
 	it.only("runs a Flutter application and remains active until told to quit", async () => {
+		log("TEST runs a Flutter application and remains active until told to quit\n=======================================");
 		const config = await startDebugger(flutterHelloWorldMainFile);
 		await Promise.all([
 			dc.configurationSequence(),
@@ -100,6 +101,7 @@ describe.only("flutter run debugger", () => {
 			dc.waitForEvent("terminated"),
 			dc.terminateRequest(),
 		]);
+		log("TEST runs a Flutter application and remains active until told to quit COMPLETE\n=======================================");
 	});
 
 	// Skipped due to leaving flutter_tester processes around:
@@ -123,6 +125,7 @@ describe.only("flutter run debugger", () => {
 	});
 
 	it.only("runs a Flutter application with a relative path", async () => {
+		log("TEST runs a Flutter application with a relative path\n=======================================");
 		const config = await startDebugger(flutterHelloWorldMainFile);
 		config.program = path.relative(fsPath(flutterHelloWorldFolder), fsPath(flutterHelloWorldMainFile));
 		await Promise.all([
@@ -138,9 +141,10 @@ describe.only("flutter run debugger", () => {
 			dc.waitForEvent("terminated"),
 			dc.terminateRequest(),
 		]);
+		log("TEST runs a Flutter application with a relative path COMPLETE\n=======================================");
 	});
 
-	it.only("runs a Flutter application with a variable in cwd", async () => {
+	it.skip("runs a Flutter application with a variable in cwd", async () => {
 		const config = await startDebugger(flutterHelloWorldMainFile, "${workspaceFolder}/");
 		config.program = path.relative(fsPath(flutterHelloWorldFolder), fsPath(flutterHelloWorldMainFile));
 		await Promise.all([
@@ -158,7 +162,7 @@ describe.only("flutter run debugger", () => {
 		]);
 	});
 
-	it.only("hot reloads successfully", async () => {
+	it.skip("hot reloads successfully", async () => {
 		const config = await startDebugger(flutterHelloWorldMainFile);
 		await Promise.all([
 			watchPromise("hot_reloads_successfully->configurationSequence", dc.configurationSequence()),
