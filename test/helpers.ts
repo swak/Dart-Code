@@ -155,6 +155,7 @@ let testStart = new Date();
 before("set console logger", async () => {
 	onLog((e) => {
 		if (e.category === LogCategory.Analyzer
+			|| e.category === LogCategory.Observatory
 			|| e.message.indexOf("setLibraryDebuggable") !== -1
 			|| e.message.indexOf('{"jsonrpc":"2.0", "result":{"type":"Success"}') !== -1
 			|| e.message.indexOf('{"jsonrpc":"2.0","method":"streamNotify","params":{"streamId":"Isolate","event":{"type":"Event","kind":"ServiceExtensionAdded"') !== -1
