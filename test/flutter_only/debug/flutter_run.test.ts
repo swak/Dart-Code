@@ -173,6 +173,7 @@ describe.only("flutter run debugger", () => {
 			watchPromise("hot_reloads_successfully->launch", dc.launch(config)),
 		]);
 
+		log("################ Waiting for hot reload...");
 		await watchPromise("hot_reloads_successfully->hotReload", dc.hotReload());
 
 		await Promise.all([
