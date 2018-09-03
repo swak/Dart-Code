@@ -42,6 +42,7 @@ export class DartDebugClient extends DebugClient {
 			this._supportsConfigurationDoneRequest = true;
 		}
 		if (launchArgs.request === "attach") {
+			log("################ Doing attach!?!?!?!?!?!?");
 			// Attach will be paused by default and issue a step when we connect; but our tests
 			// generally assume we will automatically resume.
 			log("Attaching to process...");

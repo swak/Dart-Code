@@ -167,6 +167,7 @@ describe.only("flutter run debugger", () => {
 	it.only("hot reloads successfully", async () => {
 		log("TEST hot reloads successfully\n=======================================");
 		const config = await startDebugger(flutterHelloWorldMainFile);
+		log("################ Waiting for launch...");
 		await Promise.all([
 			watchPromise("hot_reloads_successfully->configurationSequence", dc.configurationSequence()),
 			watchPromise("hot_reloads_successfully->launch", dc.launch(config)),

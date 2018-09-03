@@ -18,6 +18,7 @@ import assert = require('assert');
 import net = require('net');
 import { ProtocolClient } from 'vscode-debugadapter-testsupport/lib/protocolClient';
 import { DebugProtocol } from 'vscode-debugprotocol';
+import { log } from '../src/utils/log';
 
 export interface ILocation {
 	path: string;
@@ -316,8 +317,10 @@ export class DebugClient extends ProtocolClient {
 	 */
 	public configurationSequence(): Promise<any> {
 
-		return this.waitForEvent('initialized').then(event => {
-			return this.configurationDone();
+		log("################ Waiting for initialized event");
+		return this.waitForEvent('initialized').then((_) => log("################ Did get initialized!")).then(event => {
+			log("################ Waiting for configurationDone response");
+			return this.configurationDone().then((_) => log("################ Did configurationDone!"));
 		});
 	}
 
