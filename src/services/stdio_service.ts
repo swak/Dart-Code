@@ -37,7 +37,6 @@ export abstract class StdIOService<T> implements IAmDisposable {
 
 		this.process.stdout.on("data", (data: Buffer) => {
 			const message = data.toString();
-			this.logTraffic(`<==(PART) ${message}\r\n`);
 
 			// Add this message to the buffer for processing.
 			this.messageBuffer.push(message);
