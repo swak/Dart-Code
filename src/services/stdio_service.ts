@@ -50,6 +50,7 @@ export abstract class StdIOService<T> implements IAmDisposable {
 			this.logTraffic(`${data.toString()}`, LogSeverity.Error);
 		});
 		this.process.on("exit", (data: Buffer) => {
+			this.logTraffic(`Terminated!`);
 			this.processExited = true;
 		});
 	}
