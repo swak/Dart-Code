@@ -144,7 +144,8 @@ describe.only("flutter run debugger", () => {
 		log("TEST runs a Flutter application with a relative path COMPLETE\n=======================================");
 	});
 
-	it.skip("runs a Flutter application with a variable in cwd", async () => {
+	it.only("runs a Flutter application with a variable in cwd", async () => {
+		log("TEST runs a Flutter application with a variable in cwd\n=======================================");
 		const config = await startDebugger(flutterHelloWorldMainFile, "${workspaceFolder}/");
 		config.program = path.relative(fsPath(flutterHelloWorldFolder), fsPath(flutterHelloWorldMainFile));
 		await Promise.all([
@@ -160,9 +161,11 @@ describe.only("flutter run debugger", () => {
 			dc.waitForEvent("terminated"),
 			dc.terminateRequest(),
 		]);
+		log("TEST runs a Flutter application with a variable in cwd COMPLETE\n=======================================");
 	});
 
-	it.skip("hot reloads successfully", async () => {
+	it.only("hot reloads successfully", async () => {
+		log("TEST hot reloads successfully\n=======================================");
 		const config = await startDebugger(flutterHelloWorldMainFile);
 		await Promise.all([
 			watchPromise("hot_reloads_successfully->configurationSequence", dc.configurationSequence()),
@@ -175,9 +178,10 @@ describe.only("flutter run debugger", () => {
 			watchPromise("hot_reloads_successfully->waitForEvent:terminated", dc.waitForEvent("terminated")),
 			watchPromise("hot_reloads_successfully->terminateRequest", dc.terminateRequest()),
 		]);
+		log("TEST hot reloads successfully COMPLETE\n=======================================");
 	});
 
-	it("hot restarts successfully", async () => {
+	it.only("hot restarts successfully", async () => {
 		const config = await startDebugger(flutterHelloWorldMainFile);
 		await Promise.all([
 			dc.configurationSequence(),
