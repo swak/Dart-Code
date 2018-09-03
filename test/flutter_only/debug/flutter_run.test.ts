@@ -2,7 +2,7 @@ import * as assert from "assert";
 import * as path from "path";
 import * as vs from "vscode";
 import { DebugProtocol } from "vscode-debugprotocol";
-import { isWin } from "../../../src/debug/utils";
+import { isWin, safeSpawn } from "../../../src/debug/utils";
 import { fsPath } from "../../../src/utils";
 import { log, logError } from "../../../src/utils/log";
 import { DartDebugClient } from "../../dart_debug_client";
@@ -68,6 +68,13 @@ describe.only("flutter run debugger", () => {
 	afterEach(() => watchPromise("Killing flutter_tester processes", killFlutterTester()));
 
 	async function startDebugger(script?: vs.Uri | string, cwd?: string): Promise<vs.DebugConfiguration> {
+
+		const proc = safeSpawn(undefined, "ps", []);
+		proc.stdout.on("data", (data: Buffer) => {
+			log(data.toString());
+		});
+		await delay(1000);
+
 		const config = await getLaunchConfiguration(script, { deviceId: "flutter-tester" });
 		await watchPromise("startDebugger->start", dc.start(config.debugServer));
 		// Make sure any stdErr is logged to console + log file for debugging.
