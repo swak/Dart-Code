@@ -4,7 +4,7 @@ import * as vs from "vscode";
 import { DebugProtocol } from "vscode-debugprotocol";
 import { isWin } from "../../../src/debug/utils";
 import { fsPath } from "../../../src/utils";
-import { logError } from "../../../src/utils/log";
+import { log, logError } from "../../../src/utils/log";
 import { DartDebugClient } from "../../dart_debug_client";
 import { ensureVariable, killFlutterTester } from "../../debug_helpers";
 import { activate, defer, delay, ext, extApi, flutterHelloWorldBrokenFile, flutterHelloWorldExampleSubFolder, flutterHelloWorldExampleSubFolderMainFile, flutterHelloWorldFolder, flutterHelloWorldMainFile, getLaunchConfiguration, openFile, positionOf, watchPromise } from "../../helpers";
@@ -16,10 +16,16 @@ const disableDebuggingToAvoidBreakingOnCaughtException = true;
 
 describe.only("flutter run debugger", () => {
 	beforeEach("set timeout", function () {
+		log("Setting timeout");
 		this.timeout(60000); // These tests can be slow due to flutter package fetches when running.
 	});
-	beforeEach("activate flutterHelloWorldMainFile", () => activate(flutterHelloWorldMainFile));
+	beforeEach("activate flutterHelloWorldMainFile", async () => {
+		log("Activating..");
+		await activate(flutterHelloWorldMainFile);
+		log("Done!");
+	});
 	beforeEach("skip if no test device", function () {
+		log("Skipping if no test device (or may be flaky)");
 		if (extApi.daemonCapabilities.flutterTesterMayBeFlaky)
 			this.skip();
 		// Skip on Windows due to https://github.com/flutter/flutter/issues/17833
@@ -29,12 +35,25 @@ describe.only("flutter run debugger", () => {
 
 	// We don't commit all the iOS/Android stuff to this repo to save space, but we can bring it back with
 	// `flutter create .`!
-	before("run 'flutter create'", () => vs.commands.executeCommand("_flutter.create", path.join(fsPath(flutterHelloWorldFolder), "dummy"), "."));
-	before("run 'flutter create' for example", () => vs.commands.executeCommand("_flutter.create", path.join(fsPath(flutterHelloWorldExampleSubFolder), "dummy"), "."));
-	before("run 'flutter clean'", () => vs.commands.executeCommand("_flutter.clean", path.join(fsPath(flutterHelloWorldFolder), "dummy"), "."));
+	before("run 'flutter create'", async () => {
+		log("Running create...");
+		await vs.commands.executeCommand("_flutter.create", path.join(fsPath(flutterHelloWorldFolder), "dummy"), ".");
+		log("Done!");
+	});
+	before("run 'flutter create' for example", async () => {
+		log("Running for example too!");
+		await vs.commands.executeCommand("_flutter.create", path.join(fsPath(flutterHelloWorldExampleSubFolder), "dummy"), ".");
+		log("Done!");
+	});
+	before("run 'flutter clean'", async () => {
+		log("Running flutter clean!");
+		await vs.commands.executeCommand("_flutter.clean", path.join(fsPath(flutterHelloWorldFolder), "dummy"), ".");
+		log("Done!");
+	});
 
 	let dc: DartDebugClient;
 	beforeEach("create debug client", () => {
+		log("Creating debug client..");
 		dc = new DartDebugClient(process.execPath, path.join(ext.extensionPath, "out/src/debug/flutter_debug_entry.js"), "dart");
 		dc.defaultTimeout = 60000;
 		const thisDc = dc;
