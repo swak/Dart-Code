@@ -1,5 +1,5 @@
 import { ITest, reporters } from "mocha";
-import { LogCategory, LogSeverity } from "../src/debug/utils";
+import { LogCategory, LogSeverity, safeSpawn } from "../src/debug/utils";
 import { log } from "../src/utils/log";
 import testRunner = require("vscode/lib/testrunner");
 
@@ -21,13 +21,21 @@ export class LoggingReporter extends reporters.Base {
 			log(`Test ${test.fullTitle()} passed after ${test.duration}ms`, LogSeverity.Info, LogCategory.CI);
 		});
 
-		runner.on("fail", (test: ITest) => {
+		runner.on("fail", async (test: ITest) => {
 			log(`Test ${test.fullTitle()} failed after ${test.duration}ms`, LogSeverity.Error, LogCategory.CI);
 			const err = (test as any).err;
 			if (err) {
 				log(err.message, LogSeverity.Error, LogCategory.CI);
 				log(err.stack, LogSeverity.Error, LogCategory.CI);
 			}
+
+			await new Promise((resolve) => {
+				const proc = safeSpawn(undefined, "bash", ["-c", 'pgrep flutter_tester | xargs -I % lldb -p % -o "thread backtrace all" -b']);
+				proc.stdout.on("data", (data) => console.warn(data.toString()));
+				proc.stderr.on("data", (data) => console.warn(data.toString()));
+				proc.on("close", (code) => console.warn(`close code ${code}`));
+				proc.on("exit", (code) => console.warn(`exit code ${code}`));
+			});
 		});
 
 		// runner.once("end", () => { });
