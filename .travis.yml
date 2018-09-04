@@ -16,7 +16,8 @@ env:
   matrix:
     - ONLY_RUN_CODE_VERSION=STABLE ONLY_RUN_DART_VERSION=STABLE
     - ONLY_RUN_CODE_VERSION=STABLE ONLY_RUN_DART_VERSION=DEV
- matrix:
+
+matrix:
   fast_finish: true
   allow_failures:
     - env: ONLY_RUN_CODE_VERSION=STABLE ONLY_RUN_DART_VERSION=DEV
