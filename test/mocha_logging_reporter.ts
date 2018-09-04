@@ -31,10 +31,13 @@ export class LoggingReporter extends reporters.Base {
 
 			await new Promise((resolve) => {
 				const proc = safeSpawn(undefined, "bash", ["-c", 'pgrep flutter_tester | xargs -I % lldb -p % -o "thread backtrace all" -b']);
-				proc.stdout.on("data", (data) => console.warn(data.toString()));
-				proc.stderr.on("data", (data) => console.warn(data.toString()));
-				proc.on("close", (code) => console.warn(`close code ${code}`));
-				proc.on("exit", (code) => console.warn(`exit code ${code}`));
+				proc.stdout.on("data", (data) => log(data.toString()));
+				proc.stderr.on("data", (data) => log(data.toString()));
+				proc.on("close", (code) => log(`close code ${code}`));
+				proc.on("exit", (code) => {
+					log(`exit code ${code}`);
+					resolve();
+				});
 			});
 		});
 
