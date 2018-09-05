@@ -1,5 +1,5 @@
 import { ITest, reporters } from "mocha";
-import { LogCategory, LogSeverity, safeSpawn } from "../src/debug/utils";
+import { LogCategory, LogSeverity } from "../src/debug/utils";
 import { log } from "../src/utils/log";
 import testRunner = require("vscode/lib/testrunner");
 
@@ -28,17 +28,6 @@ export class LoggingReporter extends reporters.Base {
 				log(err.message, LogSeverity.Error, LogCategory.CI);
 				log(err.stack, LogSeverity.Error, LogCategory.CI);
 			}
-
-			await new Promise((resolve) => {
-				const proc = safeSpawn(undefined, "bash", ["-c", 'pgrep flutter_tester | xargs -I % lldb -p % -o "thread backtrace all" -b']);
-				proc.stdout.on("data", (data) => log(data.toString()));
-				proc.stderr.on("data", (data) => log(data.toString()));
-				proc.on("close", (code) => log(`close code ${code}`));
-				proc.on("exit", (code) => {
-					log(`exit code ${code}`);
-					resolve();
-				});
-			});
 		});
 
 		// runner.once("end", () => { });

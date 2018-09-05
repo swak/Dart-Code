@@ -6,7 +6,7 @@ import { isWin, safeSpawn } from "../../../src/debug/utils";
 import { fsPath } from "../../../src/utils";
 import { log, logError } from "../../../src/utils/log";
 import { DartDebugClient } from "../../dart_debug_client";
-import { ensureVariable, killFlutterTester } from "../../debug_helpers";
+import { ensureVariable } from "../../debug_helpers";
 import { activate, defer, delay, ext, extApi, flutterHelloWorldBrokenFile, flutterHelloWorldExampleSubFolder, flutterHelloWorldExampleSubFolderMainFile, flutterHelloWorldFolder, flutterHelloWorldMainFile, getLaunchConfiguration, openFile, positionOf, watchPromise } from "../../helpers";
 
 // When this issue is fixed and makes beta, we can delete this cool and the code
@@ -31,6 +31,19 @@ describe.only("flutter run debugger", () => {
 		// Skip on Windows due to https://github.com/flutter/flutter/issues/17833
 		if (isWin)
 			this.skip();
+	});
+
+	afterEach("Dump flutter_tester", async () => {
+		await new Promise((resolve) => {
+			const proc = safeSpawn(undefined, "bash", ["-c", 'pgrep flutter_tester | xargs -I % lldb -p % -o "thread backtrace all" -b']);
+			proc.stdout.on("data", (data) => log(data.toString()));
+			proc.stderr.on("data", (data) => log(data.toString()));
+			proc.on("close", (code) => log(`close code ${code}`));
+			proc.on("exit", (code) => {
+				log(`exit code ${code}`);
+				resolve();
+			});
+		});
 	});
 
 	// We don't commit all the iOS/Android stuff to this repo to save space, but we can bring it back with
@@ -65,7 +78,7 @@ describe.only("flutter run debugger", () => {
 		this.timeout(60000); // These tests can be slow due to flutter package fetches when running.
 	});
 
-	afterEach(() => watchPromise("Killing flutter_tester processes", killFlutterTester()));
+	// afterEach(() => watchPromise("Killing flutter_tester processes", killFlutterTester()));
 
 	async function startDebugger(script?: vs.Uri | string, cwd?: string): Promise<vs.DebugConfiguration> {
 
