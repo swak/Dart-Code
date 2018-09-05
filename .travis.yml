@@ -69,6 +69,8 @@ before_install:
   - flutter/bin/flutter --version
   - node --version
   - npm --version
+  - python --version
+  - which python
   - flutter/bin/flutter doctor
   - export FLUTTER_PATH=`pwd`/flutter
   - export DART_PATH=`pwd`/dart-sdk
