@@ -6,7 +6,7 @@ import { fsPath, versionIsAtLeast } from "../../../src/utils";
 import { DartDebugClient } from "../../dart_debug_client";
 import { activate, defer, ext, extApi, flutterHelloWorldFolder, flutterTestBrokenFile, flutterTestMainFile, flutterTestOtherFile, getLaunchConfiguration, openFile, positionOf } from "../../helpers";
 
-describe("flutter test debugger", () => {
+describe.only("flutter test debugger", () => {
 
 	let testPrefix = "- ";
 	beforeEach("activate flutterTestMainFile", async () => {
