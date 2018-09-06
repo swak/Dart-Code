@@ -34,8 +34,13 @@ before_install:
   - export ELECTRON_NO_ATTACH_CONSOLE=1
   - export TRAVIS_COMMIT_AUTHOR="$(git log -1 $TRAVIS_COMMIT --pretty="%aN")"
   - gem install dpl
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then 
-      brew install python3;
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      which python
+      which python3
+      which pip
+      which virtualenv
+      brew upgrade python;
+      pip install virtualenv;
       virtualenv venv -p python3;
       source venv/bin/activate;
     fi
@@ -74,7 +79,6 @@ before_install:
   - node --version
   - npm --version
   - python --version
-  - which python
   - flutter/bin/flutter doctor
   - export FLUTTER_PATH=`pwd`/flutter
   - export DART_PATH=`pwd`/dart-sdk
