@@ -35,6 +35,8 @@ before_install:
   - export TRAVIS_COMMIT_AUTHOR="$(git log -1 $TRAVIS_COMMIT --pretty="%aN")"
   - gem install dpl
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      echo $PATH
+      /usr/bin/python --version
       which python
       which python3
       which pip
