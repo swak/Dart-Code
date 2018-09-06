@@ -2,6 +2,7 @@ sudo: false
 
 os:
   - osx
+  - linux
 
 language: node_js
 node_js: lts/*
@@ -14,7 +15,16 @@ env:
     - FLUTTER_TEST=true
   matrix:
     - ONLY_RUN_CODE_VERSION=STABLE ONLY_RUN_DART_VERSION=STABLE
+    - ONLY_RUN_CODE_VERSION=DEV    ONLY_RUN_DART_VERSION=STABLE
     - ONLY_RUN_CODE_VERSION=STABLE ONLY_RUN_DART_VERSION=DEV
+    - ONLY_RUN_CODE_VERSION=DEV    ONLY_RUN_DART_VERSION=DEV
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - env: ONLY_RUN_CODE_VERSION=DEV    ONLY_RUN_DART_VERSION=STABLE
+    - env: ONLY_RUN_CODE_VERSION=STABLE ONLY_RUN_DART_VERSION=DEV
+    - env: ONLY_RUN_CODE_VERSION=DEV    ONLY_RUN_DART_VERSION=DEV
 
 addons:
   apt:
@@ -27,9 +37,7 @@ before_install:
   - echo Misc setup
   - export ELECTRON_NO_ATTACH_CONSOLE=1
   - export TRAVIS_COMMIT_AUTHOR="$(git log -1 $TRAVIS_COMMIT --pretty="%aN")"
-  - export PATH=/usr/bin:$PATH
-  - which python
-  - pip install six
+  - gem install dpl
   - if [ $TRAVIS_OS_NAME == "linux" ]; then
       export CXX="g++-4.8" CC="gcc-4.8" DISPLAY=:99.0;
       sh -e /etc/init.d/xvfb start;
@@ -43,20 +51,19 @@ before_install:
   - echo Setting variables...
   - if [[ $ONLY_RUN_DART_VERSION == "STABLE" ]]; then
       export DART_CHANNEL=stable;
-      export FLUTTER_BRANCH=beta-with-verbose-flutter-tester;
+      export FLUTTER_BRANCH=beta;
     else
       export DART_CHANNEL=dev;
-      export FLUTTER_BRANCH=master-with-verbose-flutter-tester;
+      export FLUTTER_BRANCH=master;
     fi
   - mkdir with\ spaces
   - cd with\ spaces
   - echo Downloading Dart and Flutter...
   - curl https://storage.googleapis.com/dart-archive/channels/$DART_CHANNEL/release/latest/sdk/dartsdk-$DART_OS-x64-release.zip > dart-sdk.zip
   - unzip dart-sdk.zip > /dev/null
-  - git clone -b $FLUTTER_BRANCH https://github.com/DanTup/flutter.git
+  - git clone -b $FLUTTER_BRANCH https://github.com/flutter/flutter.git
   - export FLUTTER_ROOT=`pwd`/flutter
   - export DART_SDK_PATHS=`pwd`/dart-sdk/bin:`pwd`/flutter/bin
-  - export PATH=`pwd`/dart-sdk/bin:`pwd`/flutter/bin:$PATH
   - echo Configuring Dart and Flutter...
   - flutter/bin/flutter config --no-analytics
   - flutter/bin/flutter update-packages
@@ -64,7 +71,6 @@ before_install:
   - flutter/bin/flutter --version
   - node --version
   - npm --version
-  - python --version
   - flutter/bin/flutter doctor
   - export FLUTTER_PATH=`pwd`/flutter
   - export DART_PATH=`pwd`/dart-sdk
@@ -73,6 +79,37 @@ before_install:
 install:
   - npm install --depth 0
 
+before_script:
+  - if [ $TRAVIS_OS_NAME == "linux" ]; then
+      curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter;
+    else
+      curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-darwin-amd64 > ./cc-test-reporter;
+    fi
+  - chmod +x ./cc-test-reporter;
+  - ./cc-test-reporter before-build;
+
 script:
   - npm run vscode:prepublish
+  - npm run lint
   - npm test
+  # flutter_tester processes are leaked by tests that terminate early:
+  # https://github.com/Dart-Code/Dart-Code/issues/1175
+  # This doesn't affect end users (since normally we're not spawning their device) so we
+  # just kill them all and then to a check for remaining Dart processes (we still want
+  # to ensure we're not leaking anything else).
+  - killall flutter_tester || true
+  - ps -ax | grep -v grep | grep dart || true
+  - if [[ $(pgrep -x dart) ]]; then
+      echo 'DART WAS FOUND';
+      travis_result 1;
+    fi;
+
+after_script:
+  - if [ $TRAVIS_PULL_REQUEST = "false" ]; then
+      dpl --provider=s3 --bucket="test-results.dartcode.org" --skip_cleanup=true --local-dir=".test_results" --upload-dir="$TRAVIS_BRANCH/$TRAVIS_COMMIT/$TRAVIS_OS_NAME" --acl=public_read --default_text_charset=utf-8;
+      dpl --provider=s3 --bucket="test-results.dartcode.org" --skip_cleanup=true --local-dir=".dart_code_test_logs" --upload-dir="logs/$TRAVIS_BRANCH/$TRAVIS_COMMIT/$TRAVIS_OS_NAME" --acl=public_read --default_text_charset=utf-8;
+    fi
+  - if [ $ONLY_RUN_CODE_VERSION == "STABLE" ] && [ $ONLY_RUN_DART_VERSION == "STABLE" ]; then
+      ./cc-test-reporter after-build --prefix ../../ --exit-code $TRAVIS_TEST_RESULT;
+      npm run post_result_to_chat;
+    fi
