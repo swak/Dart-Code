@@ -98,7 +98,7 @@ describe.only("flutter run debugger", () => {
 		return config;
 	}
 
-	it("runs a Flutter application and remains active until told to quit", async () => {
+	it.only("runs a Flutter application and remains active until told to quit", async () => {
 		log("TEST runs a Flutter application and remains active until told to quit\n=======================================");
 		const config = await startDebugger(flutterHelloWorldMainFile);
 		await Promise.all([
@@ -137,7 +137,7 @@ describe.only("flutter run debugger", () => {
 		]);
 	});
 
-	it("runs a Flutter application with a relative path", async () => {
+	it.only("runs a Flutter application with a relative path", async () => {
 		log("TEST runs a Flutter application with a relative path\n=======================================");
 		const config = await startDebugger(flutterHelloWorldMainFile);
 		config.program = path.relative(fsPath(flutterHelloWorldFolder), fsPath(flutterHelloWorldMainFile));
@@ -157,7 +157,7 @@ describe.only("flutter run debugger", () => {
 		log("TEST runs a Flutter application with a relative path COMPLETE\n=======================================");
 	});
 
-	it("runs a Flutter application with a variable in cwd", async () => {
+	it.only("runs a Flutter application with a variable in cwd", async () => {
 		log("TEST runs a Flutter application with a variable in cwd\n=======================================");
 		const config = await startDebugger(flutterHelloWorldMainFile, "${workspaceFolder}/");
 		config.program = path.relative(fsPath(flutterHelloWorldFolder), fsPath(flutterHelloWorldMainFile));
@@ -177,7 +177,7 @@ describe.only("flutter run debugger", () => {
 		log("TEST runs a Flutter application with a variable in cwd COMPLETE\n=======================================");
 	});
 
-	it("hot reloads successfully", async () => {
+	it.only("hot reloads successfully", async () => {
 		log("TEST hot reloads successfully\n=======================================");
 		const config = await startDebugger(flutterHelloWorldMainFile);
 		log("################ Waiting for launch...");
