@@ -14,7 +14,7 @@ import { activate, defer, delay, ext, extApi, flutterHelloWorldBrokenFile, flutt
 // https://github.com/flutter/flutter/issues/17838
 const disableDebuggingToAvoidBreakingOnCaughtException = true;
 
-describe.only("flutter run debugger", () => {
+describe("flutter run debugger", () => {
 	beforeEach("set timeout", function () {
 		log("Setting timeout");
 		this.timeout(60000); // These tests can be slow due to flutter package fetches when running.
