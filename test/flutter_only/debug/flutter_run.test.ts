@@ -33,18 +33,18 @@ describe("flutter run debugger", () => {
 			this.skip();
 	});
 
-	afterEach("Dump flutter_tester", async () => {
-		await new Promise((resolve) => {
-			const proc = safeSpawn(undefined, "bash", ["-c", 'pgrep flutter_tester | xargs -I % lldb -p % -o "thread backtrace all" -b']);
-			proc.stdout.on("data", (data) => log(data.toString()));
-			proc.stderr.on("data", (data) => log(data.toString()));
-			proc.on("close", (code) => log(`close code ${code}`));
-			proc.on("exit", (code) => {
-				log(`exit code ${code}`);
-				resolve();
-			});
-		});
-	});
+	// afterEach("Dump flutter_tester", async () => {
+	// 	await new Promise((resolve) => {
+	// 		const proc = safeSpawn(undefined, "bash", ["-c", 'pgrep flutter_tester | xargs -I % lldb -p % -o "thread backtrace all" -b']);
+	// 		proc.stdout.on("data", (data) => log(data.toString()));
+	// 		proc.stderr.on("data", (data) => log(data.toString()));
+	// 		proc.on("close", (code) => log(`close code ${code}`));
+	// 		proc.on("exit", (code) => {
+	// 			log(`exit code ${code}`);
+	// 			resolve();
+	// 		});
+	// 	});
+	// });
 
 	// We don't commit all the iOS/Android stuff to this repo to save space, but we can bring it back with
 	// `flutter create .`!
