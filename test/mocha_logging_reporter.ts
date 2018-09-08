@@ -21,7 +21,7 @@ export class LoggingReporter extends reporters.Base {
 			log(`Test ${test.fullTitle()} passed after ${test.duration}ms`, LogSeverity.Info, LogCategory.CI);
 		});
 
-		runner.on("fail", async (test: ITest) => {
+		runner.on("fail", (test: ITest) => {
 			log(`Test ${test.fullTitle()} failed after ${test.duration}ms`, LogSeverity.Error, LogCategory.CI);
 			const err = (test as any).err;
 			if (err) {

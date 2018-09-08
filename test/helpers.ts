@@ -12,7 +12,7 @@ import { DartRenameProvider } from "../src/providers/dart_rename_provider";
 import { DebugConfigProvider } from "../src/providers/debug_config_provider";
 import { internalApiSymbol } from "../src/symbols";
 import { fsPath, ProjectType, Sdks, vsCodeVersionConstraint } from "../src/utils";
-import { log, logError, logTo, logWarn, onLog } from "../src/utils/log";
+import { log, logError, logTo, logWarn } from "../src/utils/log";
 import { TestResultsProvider } from "../src/views/test_view";
 import sinon = require("sinon");
 
@@ -151,37 +151,37 @@ export async function openFile(file: vs.Uri): Promise<vs.TextEditor> {
 	return vs.window.showTextDocument(await vs.workspace.openTextDocument(file));
 }
 
-let testStart = new Date();
-before("set console logger", async () => {
-	onLog((e) => {
-		if (e.category === LogCategory.Analyzer
-			|| e.category === LogCategory.Observatory
-			|| e.message.indexOf("setLibraryDebuggable") !== -1
-			|| e.message.indexOf('{"jsonrpc":"2.0", "result":{"type":"Success"}') !== -1
-			|| e.message.indexOf('{"jsonrpc":"2.0","method":"streamNotify","params":{"streamId":"Isolate","event":{"type":"Event","kind":"ServiceExtensionAdded"') !== -1
-			|| e.message.indexOf('"method":"streamListen"') !== -1
-			|| _.trimEnd(e.message) === "")
-			return;
-		const message = _.trimEnd(e.message);
-		let logMessage = message;
+// let testStart = new Date();
+// before("set console logger", async () => {
+// 	onLog((e) => {
+// 		if (e.category === LogCategory.Analyzer
+// 			|| e.category === LogCategory.Observatory
+// 			|| e.message.indexOf("setLibraryDebuggable") !== -1
+// 			|| e.message.indexOf('{"jsonrpc":"2.0", "result":{"type":"Success"}') !== -1
+// 			|| e.message.indexOf('{"jsonrpc":"2.0","method":"streamNotify","params":{"streamId":"Isolate","event":{"type":"Event","kind":"ServiceExtensionAdded"') !== -1
+// 			|| e.message.indexOf('"method":"streamListen"') !== -1
+// 			|| _.trimEnd(e.message) === "")
+// 			return;
+// 		const message = _.trimEnd(e.message);
+// 		let logMessage = message;
 
-		const stripStrings = ['{"jsonrpc":"2.0", "result":{"type":"Success"}'];
-		stripStrings.forEach((s) => {
-			const re = new RegExp(_.escapeRegExp(s), "g");
-			logMessage = logMessage.replace(re, "");
-		});
+// 		const stripStrings = ['{"jsonrpc":"2.0", "result":{"type":"Success"}'];
+// 		stripStrings.forEach((s) => {
+// 			const re = new RegExp(_.escapeRegExp(s), "g");
+// 			logMessage = logMessage.replace(re, "");
+// 		});
 
-		const now = new Date();
-		const seconds = (now.getTime() - testStart.getTime()) / 1000;
+// 		const now = new Date();
+// 		const seconds = (now.getTime() - testStart.getTime()) / 1000;
 
-		console.log(`[[[ + ${seconds} sec since test start ]] ${logMessage}`);
-	});
-});
+// 		console.log(`[[[ + ${seconds} sec since test start ]] ${logMessage}`);
+// 	});
+// });
 
 beforeEach("set logger", async function () {
 	if (!this.currentTest)
 		return;
-	testStart = new Date();
+	// testStart = new Date();
 	const logFolder = process.env.DC_TEST_LOGS || path.join(ext.extensionPath, ".dart_code_test_logs");
 	if (!fs.existsSync(logFolder))
 		fs.mkdirSync(logFolder);

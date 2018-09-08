@@ -19,11 +19,7 @@ describe("flutter run debugger", () => {
 		log("Setting timeout");
 		this.timeout(60000); // These tests can be slow due to flutter package fetches when running.
 	});
-	beforeEach("activate flutterHelloWorldMainFile", async () => {
-		log("Activating..");
-		await activate(flutterHelloWorldMainFile);
-		log("Done!");
-	});
+	beforeEach("activate flutterHelloWorldMainFile", () => activate(flutterHelloWorldMainFile));
 	beforeEach("skip if no test device", function () {
 		log("Skipping if no test device (or may be flaky)");
 		if (extApi.daemonCapabilities.flutterTesterMayBeFlaky)
@@ -48,21 +44,9 @@ describe("flutter run debugger", () => {
 
 	// We don't commit all the iOS/Android stuff to this repo to save space, but we can bring it back with
 	// `flutter create .`!
-	before("run 'flutter create'", async () => {
-		log("Running create...");
-		await vs.commands.executeCommand("_flutter.create", path.join(fsPath(flutterHelloWorldFolder), "dummy"), ".");
-		log("Done!");
-	});
-	before("run 'flutter create' for example", async () => {
-		log("Running for example too!");
-		await vs.commands.executeCommand("_flutter.create", path.join(fsPath(flutterHelloWorldExampleSubFolder), "dummy"), ".");
-		log("Done!");
-	});
-	before("run 'flutter clean'", async () => {
-		log("Running flutter clean!");
-		await vs.commands.executeCommand("_flutter.clean", path.join(fsPath(flutterHelloWorldFolder), "dummy"), ".");
-		log("Done!");
-	});
+	before("run 'flutter create'", () => vs.commands.executeCommand("_flutter.create", path.join(fsPath(flutterHelloWorldFolder), "dummy"), "."));
+	before("run 'flutter create' for example", () => vs.commands.executeCommand("_flutter.create", path.join(fsPath(flutterHelloWorldExampleSubFolder), "dummy"), "."));
+	before("run 'flutter clean'", () => vs.commands.executeCommand("_flutter.clean", path.join(fsPath(flutterHelloWorldFolder), "dummy"), "."));
 
 	let dc: DartDebugClient;
 	beforeEach("create debug client", () => {
