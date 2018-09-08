@@ -6,7 +6,7 @@ import { isWin } from "../../../src/debug/utils";
 import { fsPath } from "../../../src/utils";
 import { log, logError } from "../../../src/utils/log";
 import { DartDebugClient } from "../../dart_debug_client";
-import { ensureVariable } from "../../debug_helpers";
+import { ensureVariable, killFlutterTester } from "../../debug_helpers";
 import { activate, defer, delay, ext, extApi, flutterHelloWorldBrokenFile, flutterHelloWorldExampleSubFolder, flutterHelloWorldExampleSubFolderMainFile, flutterHelloWorldFolder, flutterHelloWorldMainFile, getLaunchConfiguration, openFile, positionOf, watchPromise } from "../../helpers";
 
 // When this issue is fixed and makes beta, we can delete this cool and the code
@@ -49,7 +49,7 @@ describe("flutter run debugger", () => {
 		this.timeout(60000); // These tests can be slow due to flutter package fetches when running.
 	});
 
-	// afterEach(() => watchPromise("Killing flutter_tester processes", killFlutterTester()));
+	afterEach(killFlutterTester);
 
 	async function startDebugger(script?: vs.Uri | string, cwd?: string): Promise<vs.DebugConfiguration> {
 		const config = await getLaunchConfiguration(script, { deviceId: "flutter-tester" });

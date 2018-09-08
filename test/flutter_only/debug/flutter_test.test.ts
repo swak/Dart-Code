@@ -31,7 +31,7 @@ describe("flutter test debugger", () => {
 		defer(() => thisDc.stop());
 	});
 
-	// afterEach(killFlutterTester);
+	afterEach(killFlutterTester);
 
 	async function startDebugger(script?: vs.Uri | string): Promise<vs.DebugConfiguration> {
 		const config = await getLaunchConfiguration(script);
