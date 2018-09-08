@@ -93,7 +93,7 @@ async function runTests(testFolder: string, workspaceFolder: string, sdkPaths: s
 
 	// Set some paths that are used inside the test run.
 	env.DC_TEST_LOGS = path.join(cwd, ".dart_code_test_logs", `${testFolder.replace("/", "_")}_${dartFriendlyName}_${codeFriendlyName}`);
-	// env.COVERAGE_OUTPUT = path.join(cwd, ".nyc_output", `${testFolder.replace("/", "_")}_${dartFriendlyName}_${codeFriendlyName}.json`);
+	env.COVERAGE_OUTPUT = path.join(cwd, ".nyc_output", `${testFolder.replace("/", "_")}_${dartFriendlyName}_${codeFriendlyName}.json`);
 	env.TEST_XML_OUTPUT = path.join(cwd, ".test_results", `${testFolder.replace("/", "_")}_${dartFriendlyName}_${codeFriendlyName}.xml`);
 
 	// Ensure any necessary folders exist.
@@ -104,25 +104,25 @@ async function runTests(testFolder: string, workspaceFolder: string, sdkPaths: s
 	if (!fs.existsSync(env.DC_TEST_LOGS))
 		fs.mkdirSync(env.DC_TEST_LOGS);
 
-	const res = await runNode(cwd, args, env);
+	let res = await runNode(cwd, args, env);
 	exitCode = exitCode || res;
 
-	// // Remap coverage output.
-	// if (fs.existsSync(env.COVERAGE_OUTPUT)) {
-	// 	// Note: Path wonkiness - only seems to work from out/src even if supplying -b!
-	// 	res = await runNode(
-	// 		path.join(cwd, "out", "src"),
-	// 		[
-	// 			"../../node_modules/remap-istanbul/bin/remap-istanbul",
-	// 			"-i",
-	// 			env.COVERAGE_OUTPUT,
-	// 			"-o",
-	// 			env.COVERAGE_OUTPUT,
-	// 		],
-	// 		env,
-	// 	);
-	// 	exitCode = exitCode || res;
-	// }
+	// Remap coverage output.
+	if (fs.existsSync(env.COVERAGE_OUTPUT)) {
+		// Note: Path wonkiness - only seems to work from out/src even if supplying -b!
+		res = await runNode(
+			path.join(cwd, "out", "src"),
+			[
+				"../../node_modules/remap-istanbul/bin/remap-istanbul",
+				"-i",
+				env.COVERAGE_OUTPUT,
+				"-o",
+				env.COVERAGE_OUTPUT,
+			],
+			env,
+		);
+		exitCode = exitCode || res;
+	}
 
 	console.log(yellow("############################################################"));
 	console.log("\n\n");
