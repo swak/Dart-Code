@@ -2,7 +2,7 @@ import * as assert from "assert";
 import * as path from "path";
 import * as vs from "vscode";
 import { DebugProtocol } from "vscode-debugprotocol";
-import { isWin, safeSpawn } from "../../../src/debug/utils";
+import { isWin } from "../../../src/debug/utils";
 import { fsPath } from "../../../src/utils";
 import { log, logError } from "../../../src/utils/log";
 import { DartDebugClient } from "../../dart_debug_client";
@@ -29,19 +29,6 @@ describe("flutter run debugger", () => {
 			this.skip();
 	});
 
-	// afterEach("Dump flutter_tester", async () => {
-	// 	await new Promise((resolve) => {
-	// 		const proc = safeSpawn(undefined, "bash", ["-c", 'pgrep flutter_tester | xargs -I % lldb -p % -o "thread backtrace all" -b']);
-	// 		proc.stdout.on("data", (data) => log(data.toString()));
-	// 		proc.stderr.on("data", (data) => log(data.toString()));
-	// 		proc.on("close", (code) => log(`close code ${code}`));
-	// 		proc.on("exit", (code) => {
-	// 			log(`exit code ${code}`);
-	// 			resolve();
-	// 		});
-	// 	});
-	// });
-
 	// We don't commit all the iOS/Android stuff to this repo to save space, but we can bring it back with
 	// `flutter create .`!
 	before("run 'flutter create'", () => vs.commands.executeCommand("_flutter.create", path.join(fsPath(flutterHelloWorldFolder), "dummy"), "."));
@@ -65,13 +52,6 @@ describe("flutter run debugger", () => {
 	// afterEach(() => watchPromise("Killing flutter_tester processes", killFlutterTester()));
 
 	async function startDebugger(script?: vs.Uri | string, cwd?: string): Promise<vs.DebugConfiguration> {
-
-		const proc = safeSpawn(undefined, "ps", []);
-		proc.stdout.on("data", (data: Buffer) => {
-			log(data.toString());
-		});
-		await delay(1000);
-
 		const config = await getLaunchConfiguration(script, { deviceId: "flutter-tester" });
 		await watchPromise("startDebugger->start", dc.start(config.debugServer));
 		// Make sure any stdErr is logged to console + log file for debugging.
@@ -164,13 +144,11 @@ describe("flutter run debugger", () => {
 	it("hot reloads successfully", async () => {
 		log("TEST hot reloads successfully\n=======================================");
 		const config = await startDebugger(flutterHelloWorldMainFile);
-		log("################ Waiting for launch...");
 		await Promise.all([
 			watchPromise("hot_reloads_successfully->configurationSequence", dc.configurationSequence()),
 			watchPromise("hot_reloads_successfully->launch", dc.launch(config)),
 		]);
 
-		log("################ Waiting for hot reload...");
 		await watchPromise("hot_reloads_successfully->hotReload", dc.hotReload());
 
 		await Promise.all([
