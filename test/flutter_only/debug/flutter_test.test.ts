@@ -4,6 +4,7 @@ import * as vs from "vscode";
 import { DebugProtocol } from "vscode-debugprotocol";
 import { fsPath, versionIsAtLeast } from "../../../src/utils";
 import { DartDebugClient } from "../../dart_debug_client";
+import { killFlutterTester } from "../../debug_helpers";
 import { activate, defer, ext, extApi, flutterHelloWorldFolder, flutterTestBrokenFile, flutterTestMainFile, flutterTestOtherFile, getLaunchConfiguration, openFile, positionOf } from "../../helpers";
 
 describe("flutter test debugger", () => {
