@@ -146,16 +146,16 @@ async function runAllTests(): Promise<void> {
 	const totalRuns = 6;
 	let runNumber = 1;
 	try {
-		// await runTests("dart_only", "hello_world", sdkPath, codeVersion, `${runNumber++} of ${totalRuns}`);
-		// await runTests("multi_root", "projects.code-workspace", sdkPath, codeVersion, `${runNumber++} of ${totalRuns}`);
-		// await runTests("multi_project_folder", "", sdkPath, codeVersion, `${runNumber++} of ${totalRuns}`);
-		// await runTests("not_activated/flutter_create", "empty", sdkPath, codeVersion, `${runNumber++} of ${totalRuns}`);
-		// if (flutterRoot) {
-		// 	await runTests("flutter_repository", flutterRoot, sdkPath, codeVersion, `${runNumber++} of ${totalRuns}`);
-		// } else {
-		// 	console.error("FLUTTER_ROOT NOT SET, SKIPPING FLUTTER REPO TESTS");
-		// 	exitCode = 1;
-		// }
+		await runTests("dart_only", "hello_world", sdkPath, codeVersion, `${runNumber++} of ${totalRuns}`);
+		await runTests("multi_root", "projects.code-workspace", sdkPath, codeVersion, `${runNumber++} of ${totalRuns}`);
+		await runTests("multi_project_folder", "", sdkPath, codeVersion, `${runNumber++} of ${totalRuns}`);
+		await runTests("not_activated/flutter_create", "empty", sdkPath, codeVersion, `${runNumber++} of ${totalRuns}`);
+		if (flutterRoot) {
+			await runTests("flutter_repository", flutterRoot, sdkPath, codeVersion, `${runNumber++} of ${totalRuns}`);
+		} else {
+			console.error("FLUTTER_ROOT NOT SET, SKIPPING FLUTTER REPO TESTS");
+			exitCode = 1;
+		}
 		// This one is run last because it's the most fragile, and can bring down the following tests if it hangs in a
 		// way that doesn't get caught by the test timeout properly.
 		await runTests("flutter_only", "flutter_hello_world", sdkPath, codeVersion, `${runNumber++} of ${totalRuns}`);
