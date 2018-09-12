@@ -47,7 +47,7 @@ export class DebugClient extends ProtocolClient {
 
 	protected _supportsConfigurationDoneRequest: boolean;
 
-	public defaultTimeout = 60000;
+	public defaultTimeout = 5000;
 
 	/**
 	 * Creates a DebugClient object that provides a promise-based API to write
