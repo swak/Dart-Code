@@ -2,7 +2,7 @@ import * as child_process from "child_process";
 import * as fs from "fs";
 import * as _ from "lodash";
 import * as path from "path";
-import { DebugSession, Event, InitializedEvent, OutputEvent, Scope, Source, StackFrame, StoppedEvent, TerminatedEvent, Thread, ThreadEvent } from "vscode-debugadapter";
+import { BreakpointEvent, DebugSession, Event, InitializedEvent, OutputEvent, Scope, Source, StackFrame, StoppedEvent, TerminatedEvent, Thread, ThreadEvent } from "vscode-debugadapter";
 import { DebugProtocol } from "vscode-debugprotocol";
 import { getLogHeader, logError } from "../utils/log";
 import { DebuggerResult, ObservatoryConnection, SourceReportKind, VM, VMBreakpoint, VMClass, VMClassRef, VMErrorRef, VMEvent, VMFrame, VMInstance, VMInstanceRef, VMIsolate, VMIsolateRef, VMLibrary, VMMapEntry, VMObj, VMResponse, VMScript, VMScriptRef, VMSentinel, VMSourceLocation, VMSourceReport, VMStack, VMTypeRef, VMUnresolvedSourceLocation } from "./dart_debug_protocol";
@@ -417,6 +417,8 @@ export class DartDebugSession extends DebugSession {
 		if (!breakpoints)
 			breakpoints = [];
 
+		await new Promise((resolve) => setTimeout(resolve, 500));
+
 		// This is a list of breakpoints we'll hand back to VS Code. They'll use the VM-provided
 		// IDs so that they can be updated later. We store them in a lookup so that if the VM gives us
 		// the same breakpoint back at all, we will only have one in the list we give to Code.
@@ -432,7 +434,7 @@ export class DartDebugSession extends DebugSession {
 
 				for (const vmBp of results) {
 					const bp = await this.vmBpToCodeBp(vmBp.thread.ref, vmBp.bp);
-					console.log(`${bp.id} Sending BP to VS Code (RESPONSE) ${bp.source && bp.source.name} ${bp.line} ${bp.column}`);
+					console.log(`${bp.id} Sending BP to VS Code (RESPONSE) ${bp.source && bp.source.path} ${bp.line} ${bp.column}`);
 					codeBps[bp.id] = bp;
 				}
 			}
@@ -1075,7 +1077,7 @@ export class DartDebugSession extends DebugSession {
 	private async sendBreakPointToCode(action: string, isolate: VMIsolateRef, breakpoint: VMBreakpoint): Promise<void> {
 		const bp = await this.vmBpToCodeBp(isolate, breakpoint);
 		console.log(`Sending ${action} BP to Code (ID: ${bp.id}) line: ${bp.line} col: ${bp.column} in ${bp.source.path}`);
-		//this.sendEvent(new BreakpointEvent(action, bp));
+		this.sendEvent(new BreakpointEvent(action, bp));
 	}
 
 	private async handlePauseEvent(event: VMEvent) {
