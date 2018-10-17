@@ -2,7 +2,6 @@ import * as assert from "assert";
 import * as path from "path";
 import * as vs from "vscode";
 import { DebugProtocol } from "vscode-debugprotocol";
-import { isWin } from "../../../src/debug/utils";
 import { fsPath } from "../../../src/utils";
 import { logError } from "../../../src/utils/log";
 import { DartDebugClient } from "../../dart_debug_client";
@@ -22,9 +21,6 @@ describe("flutter run debugger (launch)", () => {
 
 	beforeEach("skip if no test device", function () {
 		if (extApi.daemonCapabilities.flutterTesterMayBeFlaky)
-			this.skip();
-		// Skip on Windows due to https://github.com/flutter/flutter/issues/17833
-		if (isWin)
 			this.skip();
 	});
 
