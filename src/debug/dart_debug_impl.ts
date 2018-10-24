@@ -6,7 +6,7 @@ import { DebugSession, Event, InitializedEvent, OutputEvent, Scope, Source, Stac
 import { DebugProtocol } from "vscode-debugprotocol";
 import { config } from "../config";
 import { getLogHeader, logError } from "../utils/log";
-import { DebuggerResult, ObservatoryConnection, SourceReportKind, VM, VMBreakpoint, VMClass, VMClassRef, VMErrorRef, VMEvent, VMFrame, VMInstance, VMInstanceRef, VMIsolate, VMIsolateRef, VMLibrary, VMMapEntry, VMObj, VMResponse, VMScript, VMScriptRef, VMSentinel, VMSourceLocation, VMSourceReport, VMStack, VMTypeRef } from "./dart_debug_protocol";
+import { DebuggerResult, ObservatoryConnection, SourceReportKind, VM, VMBreakpoint, VMClass, VMClassRef, VMErrorRef, VMEvent, VMFrame, VMInstance, VMInstanceRef, VMIsolate, VMIsolateRef, VMLibrary, VMMapEntry, VMObj, VMResponse, VMScript, VMScriptRef, VMSentinel, VMSourceLocation, VMSourceReport, VMStack, VMTypeRef, VMVersion } from "./dart_debug_protocol";
 import { PackageMap } from "./package_map";
 import { CoverageData, DartAttachRequestArguments, DartLaunchRequestArguments, FileLocation, formatPathForVm, LogCategory, LogMessage, LogSeverity, PromiseCompleter, safeSpawn, uriToFilePath } from "./utils";
 
@@ -44,6 +44,7 @@ export class DartDebugSession extends DebugSession {
 	protected maxLogLineLength: number;
 	protected shouldKillProcessOnTerminate = true;
 	// protected observatoryUriIsProbablyReconnectable = false;
+	private serviceProtocolVersion: VMVersion = { type: "Version", major: 0, minor: 0 };
 
 	public constructor() {
 		super();
@@ -242,7 +243,7 @@ export class DartDebugSession extends DebugSession {
 			}
 			this.observatory = new ObservatoryConnection(uri);
 			this.observatory.onLogging((message) => this.log(message));
-			this.observatory.onOpen(() => {
+			this.observatory.onOpen(async () => {
 				if (!this.observatory)
 					return;
 				this.observatory.on("Isolate", (event: VMEvent) => this.handleIsolateEvent(event));
@@ -298,6 +299,7 @@ export class DartDebugSession extends DebugSession {
 
 					this.sendEvent(new InitializedEvent());
 				});
+				await this.fetchVmProtocolVersion();
 				resolve();
 			});
 
@@ -322,6 +324,16 @@ export class DartDebugSession extends DebugSession {
 				reject(error);
 			});
 		});
+	}
+
+	private async fetchVmProtocolVersion(): Promise<void> {
+		const result = await this.observatory.getVersion();
+		this.serviceProtocolVersion = result.result as VMVersion;
+	}
+
+	private serviceProtocolIsAtLeast(major: number, minor: number): boolean {
+		return this.serviceProtocolVersion.major > major
+			|| (this.serviceProtocolVersion.major === major && this.serviceProtocolVersion.minor >= minor);
 	}
 
 	protected async terminate(force: boolean): Promise<void> {
@@ -832,7 +844,9 @@ export class DartDebugSession extends DebugSession {
 
 	private async callToString(isolate: VMIsolateRef, instanceRef: VMInstanceRef, getFullString: boolean = false): Promise<string> {
 		try {
-			const result = await this.observatory.evaluate(isolate.id, instanceRef.id, "toString()");
+			const result = this.serviceProtocolIsAtLeast(3, 10)
+				? await this.observatory.invoke(isolate.id, instanceRef.id, "toString", [])
+				: await this.observatory.evaluate(isolate.id, instanceRef.id, "toString()");
 			if (result.result.type === "@Error") {
 				return null;
 			} else {
