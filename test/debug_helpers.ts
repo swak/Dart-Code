@@ -100,6 +100,7 @@ export async function spawnFlutterProcess(script: string | Uri): Promise<DartPro
 			config.deviceId,
 		],
 	);
+	console.log(`   PID: ${process.pid} (attach)`);
 	process.stdout.on("data", (data) => log(`SPROC: ${data}`, LogSeverity.Info, LogCategory.CI));
 	process.stderr.on("data", (data) => log(`SPROC: ${data}`, LogSeverity.Info, LogCategory.CI));
 	process.on("exit", (code) => log(`SPROC: Exited (${code})`, LogSeverity.Info, LogCategory.CI));

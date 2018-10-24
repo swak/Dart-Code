@@ -179,7 +179,7 @@ describe("flutter run debugger (launch)", () => {
 
 	// Skipped while it leaks processes
 	// https://github.com/Dart-Code/Dart-Code/issues/1269
-	it.skip("runs projects in sub-folders when the open file is in a project sub-folder", async () => {
+	it("runs projects in sub-folders when the open file is in a project sub-folder", async () => {
 		await openFile(flutterHelloWorldExampleSubFolderMainFile);
 		const config = await startDebugger();
 		if (disableDebuggingToAvoidBreakingOnCaughtException)

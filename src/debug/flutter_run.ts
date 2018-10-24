@@ -9,6 +9,7 @@ export class FlutterRun extends StdIOService<UnknownNotification> {
 		const command = mode === RunMode.Attach ? "attach" : "run";
 
 		this.createProcess(projectFolder, flutterBinPath, globalFlutterArgs.concat([command, "--machine"]).concat(args), envOverrides);
+		console.log(`flutter run process was started; PID is ${this.process ? this.process.pid : "???"}`);
 	}
 
 	protected shouldHandleMessage(message: string): boolean {
