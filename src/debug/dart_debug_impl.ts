@@ -413,19 +413,19 @@ export class DartDebugSession extends DebugSession {
 		args: DebugProtocol.SetBreakpointsArguments,
 	): Promise<void> {
 
-		setTimeout(() => {
-			this.sendEvent(
-				new BreakpointEvent("new",
-					{
-						column: undefined,
-						id: 2,
-						line: 13,
-						source: new Source("test.dart", "/Users/dantup/Desktop/Dart Sample/bin/donotformat/test.dart"),
-						verified: false,
-					} as DebugProtocol.Breakpoint,
-				),
-			);
-		}, 2000);
+		// setTimeout(() => {
+		// 	this.sendEvent(
+		// 		new BreakpointEvent("new",
+		// 			{
+		// 				column: undefined,
+		// 				id: 2,
+		// 				line: 13,
+		// 				source: new Source("test.dart", "/Users/dantup/Desktop/Dart Sample/bin/donotformat/test.dart"),
+		// 				verified: false,
+		// 			} as DebugProtocol.Breakpoint,
+		// 		),
+		// 	);
+		// }, 2000);
 		setTimeout(() => {
 			this.sendEvent(
 				new BreakpointEvent("changed",
@@ -440,7 +440,13 @@ export class DartDebugSession extends DebugSession {
 			);
 		}, 4000);
 
-		response.body = { breakpoints: [] };
+		response.body = {
+			breakpoints: args.breakpoints.map((b) => ({
+				column: b.column,
+				line: b.line,
+				source: args.source,
+			} as DebugProtocol.Breakpoint)),
+		};
 		this.sendResponse(response);
 	}
 
