@@ -412,63 +412,36 @@ export class DartDebugSession extends DebugSession {
 		response: DebugProtocol.SetBreakpointsResponse,
 		args: DebugProtocol.SetBreakpointsArguments,
 	): Promise<void> {
-		const source: DebugProtocol.Source = args.source;
-		let breakpoints: DebugProtocol.SourceBreakpoint[] = args.breakpoints;
-		if (!breakpoints)
-			breakpoints = [];
 
-		// This is a list of breakpoints we'll hand back to VS Code. They'll use the VM-provided
-		// IDs so that they can be updated later. We store them in a lookup so that if the VM gives us
-		// the same breakpoint back at all, we will only have one in the list we give to Code.
-		const codeBps: { [id: string]: DebugProtocol.Breakpoint } = {};
+		setTimeout(() => {
+			this.sendEvent(
+				new BreakpointEvent("new",
+					{
+						column: undefined,
+						id: 2,
+						line: 13,
+						source: new Source("test.dart", "/Users/dantup/Desktop/Dart Sample/bin/donotformat/test.dart"),
+						verified: false,
+					} as DebugProtocol.Breakpoint,
+				),
+			);
+		}, 2000);
+		setTimeout(() => {
+			this.sendEvent(
+				new BreakpointEvent("changed",
+					{
+						column: undefined,
+						id: 2,
+						line: 14,
+						source: new Source("test.dart", "/Users/dantup/Desktop/Dart Sample/bin/donotformat/test.dart"),
+						verified: true,
+					} as DebugProtocol.Breakpoint,
+				),
+			);
+		}, 4000);
 
-		// Get all possible valid source uris for the given path.
-		const uris = this.getPossibleSourceUris(source.path);
-
-		try {
-			for (const uri of uris) {
-				this.threadManager.storeBreakpoints(uri, breakpoints);
-				const results = await this.threadManager.sendUriBreakpointsToAllThreads(uri);
-
-				for (const vmBp of results) {
-					const bp = await this.vmBpToCodeBp(vmBp.thread.ref, vmBp.bp);
-					console.log(`${bp.id} Sending BP to VS Code (RESPONSE) ${bp.source && bp.source.name} ${bp.line} ${bp.column}`);
-					codeBps[bp.id] = bp;
-				}
-			}
-
-			response.body = { breakpoints: [] };
-			setTimeout(() => {
-				this.sendEvent(
-					new BreakpointEvent("new",
-						{
-							column: undefined,
-							id: 2,
-							lineNumber: 9,
-							source: new Source("test.dart", "/Users/dantup/Desktop/Dart Sample/bin/donotformat/test.dart"),
-							verified: false,
-						} as DebugProtocol.Breakpoint,
-					),
-				);
-			}, 2000);
-			setTimeout(() => {
-				this.sendEvent(
-					new BreakpointEvent("changed",
-						{
-							column: undefined,
-							id: 2,
-							lineNumber: 10,
-							source: new Source("test.dart", "/Users/dantup/Desktop/Dart Sample/bin/donotformat/test.dart"),
-							verified: true,
-						} as DebugProtocol.Breakpoint,
-					),
-				);
-			}, 4000);
-
-			this.sendResponse(response);
-		} catch (error) {
-			this.errorResponse(response, `${error}`);
-		}
+		response.body = { breakpoints: [] };
+		this.sendResponse(response);
 	}
 
 	private knownBreakpoints: { [id: string]: boolean } = {};
