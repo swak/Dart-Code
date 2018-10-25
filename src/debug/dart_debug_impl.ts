@@ -412,12 +412,12 @@ export class DartDebugSession extends DebugSession {
 		response: DebugProtocol.SetBreakpointsResponse,
 		args: DebugProtocol.SetBreakpointsArguments,
 	): Promise<void> {
+		// await new Promise((resolve) => setTimeout(resolve, 500));
+
 		const source: DebugProtocol.Source = args.source;
 		let breakpoints: DebugProtocol.SourceBreakpoint[] = args.breakpoints;
 		if (!breakpoints)
 			breakpoints = [];
-
-		await new Promise((resolve) => setTimeout(resolve, 500));
 
 		// This is a list of breakpoints we'll hand back to VS Code. They'll use the VM-provided
 		// IDs so that they can be updated later. We store them in a lookup so that if the VM gives us
@@ -434,12 +434,14 @@ export class DartDebugSession extends DebugSession {
 
 				for (const vmBp of results) {
 					const bp = await this.vmBpToCodeBp(vmBp.thread.ref, vmBp.bp);
-					console.log(`${bp.id} Sending BP to VS Code (RESPONSE) ${bp.source && bp.source.path} ${bp.line} ${bp.column}`);
+					// console.log(`${bp.id} Sending BP to VS Code (RESPONSE) ${bp.source && bp.source.path} ${bp.line} ${bp.column}`);
 					codeBps[bp.id] = bp;
 				}
 			}
 
 			response.body = { breakpoints: Object.keys(codeBps).map((id) => codeBps[id]) };
+			console.log("Sending response!");
+			console.log(JSON.stringify(response.body, undefined, 4));
 			this.sendResponse(response);
 		} catch (error) {
 			this.errorResponse(response, `${error}`);
@@ -1076,7 +1078,9 @@ export class DartDebugSession extends DebugSession {
 
 	private async sendBreakPointToCode(action: string, isolate: VMIsolateRef, breakpoint: VMBreakpoint): Promise<void> {
 		const bp = await this.vmBpToCodeBp(isolate, breakpoint);
-		console.log(`Sending ${action} BP to Code (ID: ${bp.id}) line: ${bp.line} col: ${bp.column} in ${bp.source.path}`);
+		// console.log(`Sending ${action} BP to Code (ID: ${bp.id}) line: ${bp.line} col: ${bp.column} in ${bp.source.path}`);
+		console.log(`Sending ${action} event...`);
+		console.log(JSON.stringify(bp, undefined, 4));
 		this.sendEvent(new BreakpointEvent(action, bp));
 	}
 
