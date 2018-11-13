@@ -2,8 +2,7 @@ import * as _ from "lodash";
 import * as path from "path";
 import * as vs from "vscode";
 import { getChannel } from "../commands/channels";
-import { extensionPath } from "../extension";
-import { fsPath } from "../utils";
+import { extensionPath, fsPath } from "../utils";
 import { getLaunchConfig } from "../utils/test";
 import { ErrorNotification, Group, GroupNotification, PrintNotification, Suite, SuiteNotification, Test, TestDoneNotification, TestStartNotification } from "./test_protocol";
 

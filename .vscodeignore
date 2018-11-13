@@ -15,6 +15,7 @@ lints/**
 tool/**
 logs/**
 media/screenshots/**
+node_modules/**
 out/test/**
 out/tool/**
 package-lock.json

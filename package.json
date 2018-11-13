@@ -38,7 +38,7 @@
 		"onCommand:flutter.createProject",
 		"onCommand:flutter.doctor"
 	],
-	"main": "./out/src/extension",
+	"main": "./out/dist/extension",
 	"contributes": {
 		"languages": [
 			{
@@ -1068,9 +1068,9 @@
 		]
 	},
 	"scripts": {
-		"vscode:prepublish": "npm run compile",
-		"compile": "echo Compiling... && tsc -p ./",
-		"watch": "tsc -watch -p ./",
+		"vscode:prepublish": "webpack --mode production",
+		"webpack": "webpack --mode development",
+		"webpack-dev": "webpack --mode development --watch",
 		"postinstall": "node ./node_modules/vscode/bin/install",
 		"lint": "tslint src/**/*.ts -t verbose",
 		"test": "npm run compile && npm run write_empty_coverage && npm run remap_empty_coverage && npm run instrument && npm run test-only && npm run report_lcov && npm run report_screen",
@@ -1107,9 +1107,12 @@
 		"signal-exit": "^3.0.2",
 		"sinon": "^7.1.1",
 		"supports-color": "^5.5.0",
+		"ts-loader": "^4.4.2",
 		"tslint": "^5.11.0",
 		"typescript": "^3.1.4",
 		"vscode": "^1.1.21",
-		"vscode-debugadapter-testsupport": "^1.32.0"
+		"vscode-debugadapter-testsupport": "^1.32.0",
+		"webpack": "^4.19.1",
+		"webpack-cli": "^3.1.0"
 	}
 }
