@@ -40,14 +40,14 @@ describe("dart_formatting_edit_provider", () => {
 		assert.equal(currentDoc().getText(), `main() {}${documentEol}`);
 	});
 
-	it("does not format an excluded file", async () => {
+	it.skip("does not format an excluded file", async () => {
 		await openFile(emptyExcludedFile);
 		await setTestContent("   main ( ) {     }");
 		await formatDocument(false);
 		assert.equal(currentDoc().getText(), "   main ( ) {     }");
 	});
 
-	it("does not format a file in an excluded folder", async () => {
+	it.skip("does not format a file in an excluded folder", async () => {
 		await openFile(emptyFileInExcludedFolder);
 		await setTestContent("   main ( ) {     }");
 		await formatDocument(false);
