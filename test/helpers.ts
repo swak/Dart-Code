@@ -9,6 +9,7 @@ import { AnalyzerCapabilities } from "../src/analysis/analyzer";
 import { dartCodeExtensionIdentifier, LogCategory, LogSeverity } from "../src/debug/utils";
 import { FlutterCapabilities } from "../src/flutter/capabilities";
 import { DaemonCapabilities } from "../src/flutter/flutter_daemon";
+import { lspReady } from "../src/lsp/setup";
 import { DartReferenceProvider } from "../src/providers/dart_reference_provider";
 import { DartRenameProvider } from "../src/providers/dart_rename_provider";
 import { DebugConfigProvider } from "../src/providers/debug_config_provider";
@@ -98,6 +99,7 @@ export async function activateWithoutAnalysis(): Promise<void> {
 	log("Activating");
 	await ext.activate();
 	extApi = ext.exports[internalApiSymbol];
+	await lspReady();
 }
 
 export async function activate(file?: vs.Uri): Promise<void> {

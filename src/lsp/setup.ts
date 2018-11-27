@@ -10,6 +10,10 @@ import * as util from "../utils";
 
 let lspClient: LanguageClient;
 
+export function lspReady() {
+	return lspClient.onReady();
+}
+
 export function initLSP(context: vs.ExtensionContext, sdks: util.Sdks) {
 	vs.window.showInformationMessage("LSP preview is enabled!");
 	const client = startLsp(context, sdks);
@@ -19,7 +23,7 @@ export function initLSP(context: vs.ExtensionContext, sdks: util.Sdks) {
 }
 
 async function startLsp(context: vs.ExtensionContext, sdks: util.Sdks): Promise<vs.Disposable> {
-	const lspInspector = vs.extensions.getExtension("octref.lsp-inspector-webview");
+	const lspInspector: any = undefined; // vs.extensions.getExtension("octref.lsp-inspector-webview");
 
 	// Open the LSP Inspector if we have it installed.
 	if (lspInspector) {
@@ -94,11 +98,16 @@ function spawn(sdks: util.Sdks): Thenable<StreamInfo> {
 	console.log(vmPath);
 	console.log(args);
 
-	const reader = process.stdout.pipe(new LoggingTransform("<=="));
-	const writer = new LoggingTransform("==>");
-	writer.pipe(process.stdin);
+	if (true) {
+		return Promise.resolve({ reader: process.stdout, writer: process.stdin });
+	} else {
+		const reader = process.stdout.pipe(new LoggingTransform("<=="));
+		const writer = new LoggingTransform("==>");
+		writer.pipe(process.stdin);
 
-	return Promise.resolve({ reader, writer });
+		return Promise.resolve({ reader, writer });
+	}
+
 }
 
 class LoggingTransform extends stream.Transform {

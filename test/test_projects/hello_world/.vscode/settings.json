@@ -1,6 +1,5 @@
 {
 	"files.insertFinalNewline": true,
-	"dart.previewPromptToRunIfErrors": true,
 	"dart.doNotFormat": [
 		"**/excluded/**",
 		"**/excluded_*.dart"
