@@ -6,7 +6,7 @@ import { DebugSession, Event, InitializedEvent, OutputEvent, Scope, Source, Stac
 import { DebugProtocol } from "vscode-debugprotocol";
 import { config } from "../config";
 import { getLogHeader, logError } from "../utils/log";
-import { DebuggerResult, ObservatoryConnection, SourceReportKind, VM, VMBreakpoint, VMClass, VMClassRef, VMErrorRef, VMEvent, VMFrame, VMInstance, VMInstanceRef, VMIsolate, VMIsolateRef, VMLibrary, VMMapEntry, VMObj, VMResponse, VMScript, VMScriptRef, VMSentinel, VMSourceLocation, VMSourceReport, VMStack, VMTypeRef } from "./dart_debug_protocol";
+import { DebuggerResult, ObservatoryConnection, SourceReportKind, VM, VMBreakpoint, VMClass, VMClassRef, VMErrorRef, VMEvent, VMFrame, VMFuncRef, VMInstance, VMInstanceRef, VMIsolate, VMIsolateRef, VMLibrary, VMLibraryRef, VMMapEntry, VMObj, VMResponse, VMScript, VMScriptRef, VMSentinel, VMSourceLocation, VMSourceReport, VMStack, VMTypeRef } from "./dart_debug_protocol";
 import { PackageMap } from "./package_map";
 import { CoverageData, DartAttachRequestArguments, DartLaunchRequestArguments, FileLocation, formatPathForVm, LogCategory, LogMessage, LogSeverity, PromiseCompleter, safeSpawn, uriToFilePath } from "./utils";
 
@@ -569,7 +569,20 @@ export class DartDebugSession extends DebugSession {
 					return;
 				}
 
-				const frameName = frame.code.name;
+				const frameNameOld = frame.code.name;
+				let frameName = "<Unknown function>";
+				let func: VMLibraryRef | VMClassRef | VMFuncRef = frame.function;
+				if (func) {
+					const names = [];
+					while (func && func.name) {
+						names.push(func.name || "Unknown function");
+						func = (func as any).owner;
+					}
+					frameName = names.reverse().join(".");
+				}
+				this.log(frameNameOld);
+				this.log(frameName);
+				this.log("---");
 				const location: VMSourceLocation = frame.location;
 
 				if (location == null) {
